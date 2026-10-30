@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#070b14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Riftbound — a mobile-first loot-driven action RPG. Forge your hero, merge your gear, and break the five rifts.">
+  <title>Riftbound — Forge Your Legend</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-weapon" viewBox="0 0 24 24"><path d="M14.5 3.5h5v5L9 19l-4-4L15.5 4.5Z"/><path d="m5 15 4 4"/><path d="m4 20 3-1 1-3"/></symbol>
+    <symbol id="i-armor" viewBox="0 0 24 24"><path d="M9 4 4 7l1.5 4L7 10v10h10V10l1.5 1L20 7l-5-3-3 2-3-2Z"/><path d="M12 6v13"/></symbol>
+    <symbol id="i-bracelet" viewBox="0 0 24 24"><path d="M4 9c2.7-2 13.3-2 16 0M4 9l1.5 3c2.3-1.4 10.7-1.4 13 0L20 9"/><path d="m12 14 2 2.2L12 19l-2-2.8L12 14Z"/></symbol>
+    <symbol id="i-earrings" viewBox="0 0 24 24"><path d="M8 3v4a3 3 0 0 1-3 3M8 3v4a3 3 0 0 0-3 3"/><path d="m5 10 2 2 2-2"/><path d="M16 3v4a3 3 0 0 0 3 3M16 3v4a3 3 0 0 1 3 3"/><path d="m19 10-2 2-2-2"/></symbol>
+    <symbol id="i-helmet" viewBox="0 0 24 24"><path d="M4 13a8 8 0 0 1 16 0v5h-4l-1-3h-6l-1 3H4v-5Z"/><path d="M12 5v5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6l-7-3Z"/><path d="M12 7v8"/></symbol>
+    <symbol id="i-boots" viewBox="0 0 24 24"><path d="M7 3v7l-3 4v4h7v-4l3-3V3H7Z"/><path d="M4 18h8"/></symbol>
+    <symbol id="i-necklace" viewBox="0 0 24 24"><path d="M5 4c0 7 3 10 7 10s7-3 7-10"/><path d="m12 14 2 3-2 3-2-3 2-3Z"/></symbol>
+    <symbol id="i-ring" viewBox="0 0 24 24"><circle cx="12" cy="14" r="5"/><path d="m8 7 4-3 4 3-4 3-4-3Z"/></symbol>
+    <symbol id="i-warrior" viewBox="0 0 24 24"><path d="M5 11a7 7 0 0 1 14 0v5l-3 2v-4H8v4l-3-2v-5Z"/><path d="M8 7.5 12 5l4 2.5"/><path d="M10 14v3M14 14v3"/></symbol>
+    <symbol id="i-mage" viewBox="0 0 24 24"><path d="M4 20c3-1 6-4 8-8l5-7-1 8-3 3c-2 2-5 4-9 4Z"/><circle cx="15" cy="6" r="2"/><path d="M14 9.5 7 19"/></symbol>
+    <symbol id="i-archer" viewBox="0 0 24 24"><path d="M5 4c8 2 8 14 0 16 5-2 9-6 9-8S10 6 5 4Z"/><path d="M9 12h11"/><path d="m17 9 3 3-3 3"/></symbol>
+    <symbol id="i-whirlwind" viewBox="0 0 24 24"><path d="M12 12c1-4 7-4 7 1s-7 6-10 3-2-9 3-10 9 3 8 8"/><path d="m4 6 3 1-1 3"/></symbol>
+    <symbol id="i-bash" viewBox="0 0 24 24"><path d="M9 3 4 5v5c0 3 2 5 5 6 3-1 5-3 5-6V5L9 3Z"/><path d="M16 9h5M18 5l3-2M18 13l3 2"/></symbol>
+    <symbol id="i-fortress" viewBox="0 0 24 24"><path d="M5 20V8l3-2v2h2V4h4v4h2V6l3 2v12H5Z"/><path d="M10 20v-5h4v5"/></symbol>
+    <symbol id="i-nova" viewBox="0 0 24 24"><path d="m12 3 2 6 6 3-6 3-2 6-2-6-6-3 6-3 2-6Z"/><path d="m19 4 .7 2.3L22 7l-2.3.7L19 10l-.7-2.3L16 7l2.3-.7L19 4Z"/></symbol>
+    <symbol id="i-lance" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/><path d="m12 2-2 3h4l-2-3Z"/></symbol>
+    <symbol id="i-meteor" viewBox="0 0 24 24"><circle cx="15" cy="15" r="5"/><path d="M11 11 3 3M12 6 7 2M6 12 2 8"/><path d="m13 15 2 2 2-2-2-2-2 2Z"/></symbol>
+    <symbol id="i-fan" viewBox="0 0 24 24"><path d="M12 21V9M5 21 3 7M19 21l2-14"/><path d="m12 9-2 3h4l-2-3ZM3 7l-1 3 3-1L3 7ZM21 7l1 3-3-1 2-2Z"/></symbol>
+    <symbol id="i-shadowstep" viewBox="0 0 24 24"><path d="M8 4v7l-3 4v5h8v-5l3-3V4H8Z"/><path d="M15 3h6M16 7h5M17 11h4"/></symbol>
+    <symbol id="i-rain" viewBox="0 0 24 24"><path d="M4 3v6M9 2v7M14 3v6M19 2v7"/><path d="m4 9-1 2 2-1-1-1ZM9 9l-1 2 2-1-1-1ZM14 9l-1 2 2-1-1-1ZM19 9l-1 2 2-1-1-1Z"/><path d="M3 17h18M5 21h14"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5 8h14l1 13H4L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M9 13h6"/></symbol>
+    <symbol id="i-anvil" viewBox="0 0 24 24"><path d="M4 8h11c3 0 5 2 5 4h-3l-2 3H8L6 12H4V8Z"/><path d="M9 15v3H6l-1 3h14l-1-3h-3v-3"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8V4Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-potion" viewBox="0 0 24 24"><path d="M9 3h6M10 3v5l-4 8a4 4 0 0 0 3.6 6h4.8A4 4 0 0 0 18 16l-4-8V3"/><path d="M7 15h10"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4V9Z"/><path d="M16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4V9Z"/><path d="M17 9l5 6M22 9l-5 6"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4c0 4 2 5 4 5M16 6h4c0 4-2 5-4 5M12 12v5M8 21h8M9 17h6v4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+    <symbol id="i-tilt" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M10 5h4M19 8l3 4-3 4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 3h6l1 4H8l1-4ZM6 7l1 14h10l1-14M10 11v6M14 11v6"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21C7 17 3 14 3 9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 9 2.5C21 14 17 17 12 21Z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-retreat" viewBox="0 0 24 24"><path d="M9 5 4 12l5 7M4 12h16"/></symbol>
+    <symbol id="i-skull" viewBox="0 0 24 24"><path d="M5 11a7 7 0 1 1 14 0v5l-3 2-1 3h-6l-1-3-3-2v-5Z"/><circle cx="9" cy="11" r="1.4"/><circle cx="15" cy="11" r="1.4"/><path d="m12 14-1 2h2l-1-2Z"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  </svg>
+
+  <div id="app">
+    <div class="ambient" aria-hidden="true">
+      <div class="ambient-rune r1"></div>
+      <div class="ambient-rune r2"></div>
+      <div class="ambient-glow g1"></div>
+      <div class="ambient-glow g2"></div>
+      <div class="motes" id="motes"></div>
+    </div>
+
+    <main id="screens">
+      <section id="screen-title" class="screen title-screen">
+        <div class="title-top">
+          <button class="icon-btn quiet" id="title-sound" aria-label="Toggle sound"></button>
+        </div>
+        <div class="title-mark" aria-hidden="true">
+          <div class="mark-ring"></div>
+          <div class="mark-ring inner"></div>
+          <div class="mark-sigil">
+            <svg class="ic"><use href="#i-spark"/></svg>
+          </div>
+        </div>
+        <div class="title-lockup">
+          <p class="eyebrow">A LOOT-FORGED ACTION RPG</p>
+          <h1>RIFT<span>BOUND</span></h1>
+          <p class="title-sub">Forge your legend. Break the five rifts.</p>
+        </div>
+        <div class="title-classes" aria-hidden="true">
+          <div class="title-class c-warrior"><svg class="ic"><use href="#i-warrior"/></svg><span>Warrior</span></div>
+          <div class="title-class c-mage"><svg class="ic"><use href="#i-mage"/></svg><span>Mage</span></div>
+          <div class="title-class c-archer"><svg class="ic"><use href="#i-archer"/></svg><span>Archer</span></div>
+        </div>
+        <div class="title-ladder-wrap" aria-hidden="true">
+          <p class="title-ladder-kicker">Four identical relics forge the next tier</p>
+          <div class="title-ladder">
+            <span class="r-common">Common</span><i>›</i>
+            <span class="r-rare">Rare</span><i>›</i>
+            <span class="r-epic">Epic</span><i>›</i>
+            <span class="r-legendary">Legendary</span><i>›</i>
+            <span class="r-mythic">Mythic</span><i>›</i>
+            <span class="r-divine">Divine</span>
+          </div>
+        </div>
+        <div class="title-actions">
+          <button class="btn btn-primary btn-xl" id="btn-continue">
+            <span class="btn-ic"><svg class="ic"><use href="#i-play"/></svg></span>
+            <span class="btn-copy"><small>Continue</small><strong id="continue-label">Your legend awaits</strong></span>
+          </button>
+          <button class="btn btn-ghost" id="btn-new">Begin a new legend</button>
+        </div>
+        <p class="title-foot">Touch · Tilt · Tactics</p>
+      </section>
+
+      <section id="screen-create" class="screen create-screen">
+        <header class="sub-header">
+          <button class="icon-btn" id="create-back" aria-label="Back"><svg class="ic flip"><use href="#i-chevron"/></svg></button>
+          <div><p class="eyebrow">STEP 1 OF 1</p><h2>Forge your hero</h2></div>
+          <span class="header-spacer"></span>
+        </header>
+        <div class="screen-scroll create-scroll">
+          <div class="class-picker" id="class-picker" role="radiogroup" aria-label="Choose a class"></div>
+          <div id="class-detail" class="class-detail"></div>
+          <label class="field">
+            <span>Hero name</span>
+            <input id="hero-name" maxlength="14" autocomplete="off" spellcheck="false" placeholder="Enter a name">
+          </label>
+          <p class="fine-print">All three paths are tuned to clear every rift. Your gear, not your class, decides how far you go.</p>
+        </div>
+        <div class="sticky-cta">
+          <button class="btn btn-primary btn-lg" id="btn-begin" disabled>Enter the rift</button>
+        </div>
+      </section>
+
+      <section id="screen-hub" class="screen hub-screen">
+        <div class="hub-fixed">
+          <header class="hero-bar" id="hero-bar"></header>
+        </div>
+        <div class="hub-content screen-scroll" id="hub-content"></div>
+        <nav class="bottom-nav" id="bottom-nav" aria-label="Main navigation">
+          <button data-tab="campaign" class="nav-btn active"><svg class="ic"><use href="#i-map"/></svg><span>Rifts</span></button>
+          <button data-tab="gear" class="nav-btn"><svg class="ic"><use href="#i-bag"/></svg><span>Gear</span><i class="nav-dot" id="gear-dot" hidden></i></button>
+          <button data-tab="forge" class="nav-btn"><svg class="ic"><use href="#i-anvil"/></svg><span>Forge</span><i class="nav-dot" id="forge-dot" hidden></i></button>
+          <button data-tab="hero" class="nav-btn"><svg class="ic"><use href="#i-user"/></svg><span>Hero</span></button>
+        </nav>
+      </section>
+
+      <section id="screen-battle" class="screen battle-screen">
+        <canvas id="battle-canvas"></canvas>
+        <div class="battle-hud" id="battle-hud">
+          <div class="battle-top">
+            <button class="icon-btn battle-pause" id="battle-pause" aria-label="Pause"><svg class="ic"><use href="#i-pause"/></svg></button>
+            <div class="battle-stage">
+              <p id="battle-chapter">Rift I</p>
+              <strong id="battle-name">Stage 1</strong>
+            </div>
+            <div class="battle-coins" id="battle-wave">Wave 1/3</div>
+          </div>
+          <div class="player-hud">
+            <div class="lvl-badge" id="battle-level">1</div>
+            <div class="player-hud-main">
+              <div class="hp-line"><span id="battle-hp-label">320 / 320</span><span id="battle-buffs"></span></div>
+              <div class="bar hp-bar"><i id="battle-hp-fill"></i><b id="battle-shield-fill"></b></div>
+              <div class="bar xp-bar thin"><i id="battle-xp-fill"></i></div>
+            </div>
+          </div>
+          <div class="boss-hud" id="boss-hud" hidden>
+            <div class="boss-line"><span id="boss-name">Boss</span><em id="boss-phase"></em></div>
+            <div class="bar boss-bar"><i id="boss-hp-fill"></i></div>
+          </div>
+          <div class="wave-banner" id="wave-banner" hidden><small id="wave-kicker"></small><strong id="wave-title"></strong></div>
+          <div class="battle-toast-feed" id="loot-feed"></div>
+          <div class="joystick" id="joystick" aria-label="Movement joystick">
+            <div class="joystick-ring"></div>
+            <div class="joystick-knob" id="joystick-knob"><svg class="ic"><use href="#i-spark"/></svg></div>
+            <span class="joystick-hint">MOVE</span>
+          </div>
+          <div class="skill-cluster">
+            <button class="skill-btn" data-skill="0" aria-label="Skill 1"><span class="skill-art"></span><svg class="ic"><use href="#i-spark"/></svg><i class="skill-cd"></i><span class="skill-key">1</span></button>
+            <button class="skill-btn" data-skill="1" aria-label="Skill 2"><span class="skill-art"></span><svg class="ic"><use href="#i-spark"/></svg><i class="skill-cd"></i><span class="skill-key">2</span></button>
+            <button class="skill-btn" data-skill="2" aria-label="Skill 3"><span class="skill-art"></span><svg class="ic"><use href="#i-spark"/></svg><i class="skill-cd"></i><span class="skill-key">3</span></button>
+            <button class="skill-btn potion-btn" id="potion-btn" aria-label="Use potion"><svg class="ic"><use href="#i-potion"/></svg><span class="potion-count" id="potion-count">2</span></button>
+          </div>
+          <div class="tutorial-tip" id="tutorial-tip" hidden></div>
+        </div>
+        <div class="battle-overlay" id="battle-overlay" hidden></div>
+      </section>
+    </main>
+
+    <div id="toast-layer" class="toast-layer" aria-live="polite"></div>
+    <div id="modal-layer" class="modal-layer" hidden></div>
+  </div>
+
+  <noscript><div class="noscript">Riftbound needs JavaScript enabled to run.</div></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Riftbound sigil">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="68%">
+      <stop offset="0" stop-color="#1a2340"/>
+      <stop offset="0.55" stop-color="#0b1122"/>
+      <stop offset="1" stop-color="#04060c"/>
+    </radialGradient>
+    <linearGradient id="rift" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe58a"/>
+      <stop offset="0.45" stop-color="#67e8f9"/>
+      <stop offset="1" stop-color="#a78bfa"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#67e8f9" stop-opacity=".55"/>
+      <stop offset="0.6" stop-color="#a78bfa" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="244" r="188" fill="url(#glow)"/>
+  <g fill="none" stroke-linecap="round">
+    <circle cx="256" cy="244" r="150" stroke="#8fa7d6" stroke-opacity=".28" stroke-width="4" stroke-dasharray="6 18"/>
+    <circle cx="256" cy="244" r="118" stroke="#b9c9e8" stroke-opacity=".18" stroke-width="2"/>
+    <path d="M256 74 332 196 316 306 256 374 196 306 180 196Z" stroke="url(#rift)" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M256 118 300 202 288 280 256 322 224 280 212 202Z" stroke="#e8f6ff" stroke-opacity=".62" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M176 366 336 366" stroke="#8fa7d6" stroke-opacity=".25" stroke-width="5"/>
+    <path d="M142 244h-34M404 244h-34M256 52v-22M256 436v22" stroke="#c7d6f4" stroke-opacity=".4" stroke-width="6"/>
+  </g>
+  <path d="M256 146 309 244 256 342 203 244Z" fill="url(#rift)" filter="url(#soft)" opacity=".62"/>
+  <path d="M256 146 309 244 256 342 203 244Z" fill="url(#rift)"/>
+  <path d="M256 172 288 238 256 314 224 238Z" fill="#08101f" opacity=".9"/>
+  <path d="M256 190 276 238 256 292 236 238Z" fill="#f4fbff" opacity=".92"/>
+  <circle cx="256" cy="238" r="9" fill="#ffe58a"/>
+  <g fill="#ffe58a">
+    <path d="M120 150l7 19 19 7-19 7-7 19-7-19-19-7 19-7z" opacity=".9"/>
+    <path d="M392 330l6 15 15 6-15 6-6 15-6-15-15-6 15-6z" opacity=".7"/>
+  </g>
+</svg>
