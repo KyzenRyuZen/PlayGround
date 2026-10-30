@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#08090c">
+  <meta name="description" content="Aetherfall: Crown of Cinders — a dark fantasy action RPG of relics, ascension, and shattered thrones.">
+  <title>Aetherfall — Crown of Cinders</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2308090c'/%3E%3Cpath d='M32 7 40 24 57 32 40 40 32 57 24 40 7 32 24 24Z' fill='none' stroke='%23d9ad66' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='5' fill='%23d9ad66'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="global-grain" aria-hidden="true"></div>
+
+    <!-- ============================ CHARACTER CREATION ============================ -->
+    <section class="screen creator-screen" id="creator-screen">
+      <div class="creator-scene" aria-hidden="true">
+        <div class="scene-sky"></div>
+        <div class="scene-eclipse"><span class="eclipse-core"></span><span class="eclipse-ring"></span><span class="eclipse-ring ring-2"></span></div>
+        <div class="scene-orbit orbit-a"></div>
+        <div class="scene-orbit orbit-b"></div>
+        <svg class="scene-ridges" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+          <defs>
+            <linearGradient id="ridge-far" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#211820"/><stop offset="1" stop-color="#0b090c"/></linearGradient>
+            <linearGradient id="ridge-mid" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#181117"/><stop offset="1" stop-color="#070708"/></linearGradient>
+            <linearGradient id="ridge-near" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#100d11"/><stop offset="1" stop-color="#050506"/></linearGradient>
+            <linearGradient id="citadel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#171017"/><stop offset="1" stop-color="#070608"/></linearGradient>
+            <radialGradient id="citadel-glow" cx=".5" cy=".4" r=".5"><stop stop-color="#f0a457" stop-opacity=".18"/><stop offset="1" stop-color="#f0a457" stop-opacity="0"/></radialGradient>
+          </defs>
+          <path d="M0 610 120 490 230 550 360 390 460 520 590 410 710 540 840 420 990 560 1120 430 1250 530 1390 380 1600 560V900H0Z" fill="url(#ridge-far)" opacity=".8"/>
+          <path d="M0 710 160 600 290 660 410 540 550 660 690 560 800 650 960 520 1090 640 1240 560 1420 670 1600 590V900H0Z" fill="url(#ridge-mid)"/>
+          <g transform="translate(815 408)" opacity=".92">
+            <ellipse cx="0" cy="46" rx="310" ry="110" fill="url(#citadel-glow)"/>
+            <path d="M-196 68-170 14-139-6-126 38-92-30-56 12-31-51 0-97 34-47 67 5 92-36 123 2 150 42 179 15 203 70Z" fill="url(#citadel)" stroke="#49342b" stroke-width="1"/>
+            <g fill="#090709" stroke="#3a2b26" stroke-width="1.4">
+              <rect x="-142" y="68" width="284" height="188"/>
+              <path d="M-142 68V8l34-31 34 31v60M-74 68V-10l40-37 40 37v78M74 68V-5l38-42 38 42v73M148 68V26l27-30 27 30v42"/>
+              <path d="M-108 104h24v38h-24ZM-42 104h22v38h-22ZM42 104h22v38h-22ZM108 104h24v38h-24ZM-12 130h42v126h-42Z"/>
+            </g>
+            <path d="M-142 256h284M-44 130h74M-7 130v126" stroke="#6e4e37" stroke-width="1" opacity=".45"/>
+            <g fill="#d89652" opacity=".6">
+              <rect x="-100" y="112" width="7" height="12"/><rect x="-34" y="112" width="5" height="12"/><rect x="50" y="112" width="5" height="12"/><rect x="118" y="112" width="7" height="12"/>
+            </g>
+            <path d="M0-97v-36M-14-119h28M-171 31v-41M-192 12h42M178 24v-48M156 1h44" stroke="#5a4030" stroke-width="1"/>
+          </g>
+          <path d="M0 802 180 722 330 772 520 690 710 780 880 700 1040 764 1210 686 1380 754 1600 692V900H0Z" fill="url(#ridge-near)"/>
+          <path d="M0 854c290-26 482 18 760-7s520-13 840 13v40H0Z" fill="#050506"/>
+        </svg>
+        <div class="scene-fog"></div>
+        <div class="scene-vignette"></div>
+        <div class="ember-field" id="ember-field"></div>
+      </div>
+
+      <header class="creator-header">
+        <div class="brand-lockup">
+          <span class="brand-mark">
+            <svg viewBox="0 0 52 52" aria-hidden="true">
+              <path d="M26 2 33 19 50 26 33 33 26 50 19 33 2 26 19 19Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              <path d="M26 10 30 22 42 26 30 30 26 42 22 30 10 26 22 22Z" fill="currentColor" opacity=".18"/>
+              <circle cx="26" cy="26" r="5" fill="none" stroke="currentColor" stroke-width="1"/>
+              <circle cx="26" cy="26" r="1.8" fill="currentColor"/>
+              <path d="M26 2v5M26 45v5M2 26h5M45 26h5" stroke="currentColor" stroke-width="1"/>
+            </svg>
+          </span>
+          <span class="brand-words"><strong>AETHERFALL</strong><small>CROWN OF CINDERS</small></span>
+        </div>
+        <div class="creator-meta">
+          <span class="meta-rule"></span>
+          <span>A DARK FANTASY ACTION RPG</span>
+          <button class="round-btn creator-sound" data-action="creator-sound" aria-label="Toggle sound">
+            <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 10h5l6-5v18l-6-5H4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M18 9c2 2 2 8 0 10M21 6c4 4 4 12 0 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="creator-main">
+        <aside class="creator-intro">
+          <div class="eyebrow intro-eyebrow"><span></span>THE CROWN IS BROKEN</div>
+          <h1>Rise from<br><em>the ashes.</em></h1>
+          <p class="creator-lede">Three paths. Nine relics. Six rarities. One empty throne above the storm. Build an ascendant, hunt what remains, and take the crown before it takes you.</p>
+          <div class="intro-features">
+            <div><strong>03</strong><span>Unique<br>classes</span></div>
+            <div><strong>09</strong><span>Relic<br>slots</span></div>
+            <div><strong>06</strong><span>Rarity<br>tiers</span></div>
+            <div><strong>12</strong><span>Trials &<br>bosses</span></div>
+          </div>
+          <div class="intro-oath">
+            <span class="oath-line"></span>
+            <p>No chosen one. Only the next to climb.</p>
+          </div>
+        </aside>
+
+        <section class="class-picker" aria-labelledby="class-picker-title">
+          <div class="picker-head">
+            <div><span class="eyebrow">FORGE YOUR ASCENDANT</span><h2 id="class-picker-title">Choose your path</h2></div>
+            <span class="picker-hint">Tap a card to inspect</span>
+          </div>
+          <div class="class-cards" id="classCards"></div>
+        </section>
+      </main>
+
+      <footer class="creator-footer">
+        <div class="name-field">
+          <label for="heroName">CHRONICLE NAME</label>
+          <div class="name-input-shell">
+            <span class="name-rune">✦</span>
+            <input id="heroName" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="Name your ascendant" aria-label="Chronicle name">
+            <span class="name-limit">16</span>
+          </div>
+        </div>
+        <div class="selection-readout" id="selectionReadout">Hold the line. Break the horde.</div>
+        <div class="selected-summary">
+          <span>PATH OF THE</span>
+          <strong id="selectedClass">Warrior</strong>
+        </div>
+        <button class="btn btn-primary btn-begin" id="beginBtn">
+          <span class="btn-shine"></span>
+          <span>Begin the Ascent</span>
+          <svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 14h17M15 7l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="footer-controls">TOUCH · TILT · INSTANT PLAY</div>
+      </footer>
+    </section>
+
+    <!-- ============================ GAME ============================ -->
+    <section class="screen game-screen hidden" id="game-screen">
+      <header class="game-header" id="game-header"></header>
+      <main class="game-content" id="game-content"></main>
+      <nav class="bottom-nav" id="bottom-nav" aria-label="Main navigation"></nav>
+    </section>
+
+    <!-- ============================ BATTLE ============================ -->
+    <section class="screen battle-screen hidden" id="battle-screen">
+      <canvas id="battle-canvas" aria-label="Action battle arena"></canvas>
+      <div class="battle-hud" id="battle-hud"></div>
+    </section>
+
+    <div class="modal-root" id="modal-root"></div>
+    <div class="toast-root" id="toast-root" aria-live="polite"></div>
+  </div>
+
+  <noscript><div class="noscript">Aetherfall requires JavaScript to run.</div></noscript>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
