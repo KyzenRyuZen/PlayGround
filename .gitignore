@@ -1,0 +1,27 @@
+
+screenshots/
+
+*.log
+
+*.pid
+
+.agents/
+
+.agentsweb/
+
+.omgithub-runtime/
+
+.opencode-ssh/
+
+.opencode-web/
+
+node_modules/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+server/secrets/
+server/data/
+*.json.key
+service-account*.json
