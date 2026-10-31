@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d0e">
+  <meta name="description" content="Ashen Oath — a dark fantasy idle clicker RPG. Hunt monsters, forge relics, and ascend through the shattered realms.">
+  <title>Ashen Oath — Idle RPG</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="svg-defs" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="i-sword" viewBox="0 0 24 24">
+        <path d="M14.5 3.5 21 3l-.5 6.5-9.8 9.8-2.9-2.9 9.7-9.9Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M4.2 19.8 8.8 15M5 16l3 3M13 6l5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-helmet" viewBox="0 0 24 24">
+        <path d="M5 12a7 7 0 0 1 14 0v6l-2.5 2H7.5L5 18v-6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M5 13h14M9.5 8.5v5M14.5 8.5v5M12 4V2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-chest" viewBox="0 0 24 24">
+        <path d="m8 3-4 4 2 5-1 8h14l-1-8 2-5-4-4-3 2h-2L8 3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 3v7l3 2 3-2V3M6 12h12" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      </symbol>
+      <symbol id="i-gloves" viewBox="0 0 24 24">
+        <path d="M7 21v-6l-2-2a2 2 0 0 1 0-3l4-4 2 2 3-3a2 2 0 0 1 3 3l-3 3 2 2-4 4v4H7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7 17h5M8 5.5 10 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-boots" viewBox="0 0 24 24">
+        <path d="M7 3v10l-3 3v4h16v-3l-6-2V3H7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M7 9h3M9 20v-3M15 15l4 1.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-ring" viewBox="0 0 24 24">
+        <circle cx="12" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="m9 8 3-5 3 5-3 2-3-2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="m9 8 3 2 3-2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="i-necklace" viewBox="0 0 24 24">
+        <path d="M5 3c0 7 2.2 10 7 10s7-3 7-10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="m12 12 3 3-3 6-3-6 3-3Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-coin" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M15 8.5c-.6-.8-1.6-1.2-3-1.2-1.8 0-3 .9-3 2.2 0 3.4 6 1.4 6 4.7 0 1.4-1.2 2.3-3 2.3-1.4 0-2.5-.5-3.2-1.4M12 5.5v13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-skull" viewBox="0 0 24 24">
+        <path d="M12 3a7.5 7.5 0 0 0-4.5 13.5V20h9v-3.5A7.5 7.5 0 0 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="9.2" cy="11" r="1.4" fill="currentColor"/>
+        <circle cx="14.8" cy="11" r="1.4" fill="currentColor"/>
+        <path d="M10 16h4M12 14.5v2M7 19h10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-star" viewBox="0 0 24 24">
+        <path d="m12 2.8 2.7 5.7 6.2.8-4.6 4.3 1.2 6.1-5.5-3-5.5 3 1.2-6.1L3.1 9.3l6.2-.8L12 2.8Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-map" viewBox="0 0 24 24">
+        <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 3v15M15 6v15" fill="none" stroke="currentColor" stroke-width="1.3"/>
+      </symbol>
+      <symbol id="i-cog" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-help" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M9.3 9a2.8 2.8 0 1 1 4 2.6c-.8.5-1.3 1.1-1.3 2.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="12" cy="17.5" r="1" fill="currentColor"/>
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m5 5 14 14M19 5 5 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-anvil" viewBox="0 0 24 24">
+        <path d="M3 8h11c1.5 0 2.5 1 3 2l4 1-2 3h-4l-1 3H8l-1-3H3V8Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M7 20h10M9 17v3M15 17v3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-bag" viewBox="0 0 24 24">
+        <path d="M5 8h14l1.5 11a2 2 0 0 1-2 2.3H5.5a2 2 0 0 1-2-2.3L5 8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2M8 12h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-arrow-up" viewBox="0 0 24 24">
+        <path d="m6 14 6-7 6 7M12 7v13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24">
+        <path d="M12 20s-8-4.7-8-10a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.3-8 10-8 10Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24">
+        <path d="M12 2.8 20 6v5.5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3.2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M12 7v9M8.5 10.5h7" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-flash" viewBox="0 0 24 24">
+        <path d="m13 2-8 12h6l-1 8 9-13h-6V2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-fire" viewBox="0 0 24 24">
+        <path d="M12 22c4.4 0 7-2.7 7-6.5 0-3.1-1.8-5.2-3.6-7.2-.6 2.1-1.7 3-2.8 3.4.4-3.4-1.2-6.5-3.8-8.7.2 3.8-3.8 5.8-3.8 11.5C5 19.1 7.7 22 12 22Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <path d="M9.5 16.5c0 2 1.1 3.5 2.5 3.5s2.5-1.4 2.5-3.2c0-1.5-.9-2.5-1.8-3.4-.3 1.1-.8 1.6-1.5 1.8.1-1.5-.5-2.8-1.4-3.8.1 1.6-.3 3-.3 5.1Z" fill="none" stroke="currentColor" stroke-width="1"/>
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path d="M20.5 14.4A8.8 8.8 0 0 1 9.6 3.5a9 9 0 1 0 10.9 10.9Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 4.5v2M15 5.5h2M19 8.5v1M18.5 9h1" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-sound-on" viewBox="0 0 24 24">
+        <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-sound-off" viewBox="0 0 24 24">
+        <path d="M4 9v6h4l5 4V5L8 9H4ZM17 9l4 6M21 9l-4 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24">
+        <path d="M4 10a8 8 0 1 1 2 7M4 10V4M4 10h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-crest" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <path d="M24 3 42 11v12c0 11-7.3 18.5-18 22C13.3 41.5 6 34 6 23V11L24 3Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M24 8 37 14v9c0 8-5 13.7-13 17-8-3.3-13-9-13-17v-9l13-6Z" fill="rgba(216,180,112,.07)" stroke="currentColor" stroke-width="1"/>
+            <path d="M24 13v22M18 21h12M18 29c2 2 4 3 6 3s4-1 6-3" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+            <circle cx="24" cy="21" r="2.2" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <h1>Ashen Oath</h1>
+          <p>An Idle Saga</p>
+        </div>
+      </div>
+
+      <div class="top-resources" aria-label="Hero resources">
+        <div class="resource-pill gold-pill" title="Gold earned by slaying monsters and selling relics">
+          <svg class="icon"><use href="#i-coin"/></svg>
+          <span class="resource-label">Gold</span>
+          <strong id="gold-value">0</strong>
+        </div>
+        <div class="resource-pill" title="Monsters slain">
+          <svg class="icon"><use href="#i-skull"/></svg>
+          <span class="resource-label">Slain</span>
+          <strong id="kills-value">0</strong>
+        </div>
+        <div class="resource-pill level-pill" title="Hero level">
+          <svg class="icon"><use href="#i-star"/></svg>
+          <span class="resource-label">Level</span>
+          <strong id="header-level">1</strong>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="icon-btn map-top-btn" id="map-btn" aria-label="Open world map" title="World Map (M)">
+          <svg class="icon"><use href="#i-map"/></svg><span>World Map</span>
+        </button>
+        <button class="icon-btn" id="sound-btn" aria-label="Toggle sound" title="Toggle sound">
+          <svg class="icon"><use id="sound-icon" href="#i-sound-on"/></svg>
+        </button>
+        <button class="icon-btn" id="help-btn" aria-label="How to play" title="How to play">
+          <svg class="icon"><use href="#i-help"/></svg>
+        </button>
+        <button class="icon-btn" id="settings-btn" aria-label="Settings" title="Settings">
+          <svg class="icon"><use href="#i-cog"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <aside class="panel hero-panel" aria-label="Hero and equipment">
+        <div class="hero-banner">
+          <div class="hero-portrait">
+            <div class="portrait-aura"></div>
+            <svg viewBox="0 0 132 132" class="portrait-art" aria-hidden="true">
+              <defs>
+                <linearGradient id="hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#30383a"/><stop offset="1" stop-color="#111516"/></linearGradient>
+                <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9aa0a2"/><stop offset=".5" stop-color="#4a5254"/><stop offset="1" stop-color="#23292b"/></linearGradient>
+                <radialGradient id="eyeGlow"><stop offset="0" stop-color="#ffe7a0"/><stop offset=".45" stop-color="#d7a84f"/><stop offset="1" stop-color="#d7a84f" stop-opacity="0"/></radialGradient>
+              </defs>
+              <circle cx="66" cy="64" r="55" fill="none" stroke="rgba(211,176,108,.18)" stroke-width=".7"/>
+              <circle cx="66" cy="64" r="49" fill="none" stroke="rgba(211,176,108,.08)" stroke-width="4" stroke-dasharray="1 7"/>
+              <path d="M27 114c5-22 18-33 39-35 21 2 34 13 39 35" fill="#151b1d" stroke="#303839" stroke-width="1"/>
+              <path d="M34 107c8-15 19-22 32-24 13 2 24 9 32 24" fill="url(#hood)" stroke="#3c4445" stroke-width="1"/>
+              <path d="M44 57c0-19 9-30 22-30s22 11 22 30v15c0 11-9 20-22 20s-22-9-22-20V57Z" fill="url(#hood)" stroke="#4a5354" stroke-width="1.2"/>
+              <path d="M50 53c0-14 7-23 16-23s16 9 16 23v14c0 9-7 15-16 15s-16-6-16-15V53Z" fill="#171d1f" stroke="url(#steel)" stroke-width="1.4"/>
+              <path d="M52 50h28M55 42l6-5M77 42l-6-5" fill="none" stroke="#667072" stroke-width="1" stroke-linecap="round"/>
+              <path d="M53 60h9M70 60h9" stroke="#d9b76a" stroke-width="2.4" stroke-linecap="round"/>
+              <circle cx="57.5" cy="60" r="6" fill="url(#eyeGlow)" opacity=".45"/>
+              <circle cx="74.5" cy="60" r="6" fill="url(#eyeGlow)" opacity=".45"/>
+              <path d="M60 78h12" stroke="#3b4243" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M52 82h28l-4 8H56l-4-8Z" fill="#202729" stroke="#465052" stroke-width=".8"/>
+              <path d="M47 58c-7 4-11 10-12 19M85 58c7 4 11 10 12 19" fill="none" stroke="#353e40" stroke-width="4" stroke-linecap="round"/>
+              <path d="M46 29c4-9 12-14 20-14s16 5 20 14" fill="none" stroke="#394244" stroke-width="2"/>
+              <circle cx="66" cy="15" r="2" fill="#d7a84f"/>
+            </svg>
+            <span class="hero-level-badge" id="hero-level-badge">1</span>
+          </div>
+          <div class="hero-identity">
+            <span class="eyebrow">The Ashen One</span>
+            <h2>Wanderer</h2>
+            <div class="xp-row"><span>Level <b id="hero-level">1</b></span><span id="xp-text">0 / 30 XP</span></div>
+            <div class="bar xp-bar"><div class="bar-fill" id="xp-fill"></div><div class="bar-shine"></div></div>
+          </div>
+        </div>
+
+        <div class="hero-vitals">
+          <div class="vital-label"><span><svg class="icon"><use href="#i-heart"/></svg> Vitality</span><span id="hero-hp-text">120 / 120</span></div>
+          <div class="bar hp-bar"><div class="bar-fill" id="hero-hp-fill"></div></div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-cell"><span>Attack</span><strong id="stat-attack">0</strong></div>
+          <div class="stat-cell"><span>Crit</span><strong id="stat-crit">0%</strong></div>
+          <div class="stat-cell"><span>Armor</span><strong id="stat-armor">0</strong></div>
+          <div class="stat-cell"><span>DPS</span><strong id="stat-dps">0</strong></div>
+        </div>
+
+        <div class="section-heading">
+          <h3>Equipment</h3>
+          <span class="section-note">7 slots</span>
+        </div>
+        <div class="equipment-grid" id="equipment-grid"></div>
+
+        <div class="hero-footer">
+          <div><span class="eyebrow">Power</span><strong id="power-value">0</strong></div>
+          <div class="hero-footer-divider"></div>
+          <div><span class="eyebrow">Auto DPS</span><strong id="auto-dps-value">0</strong></div>
+        </div>
+      </aside>
+
+      <section class="panel battle-panel" aria-label="Combat">
+        <div class="zone-header">
+          <div class="zone-emblem" id="zone-emblem" aria-hidden="true">I</div>
+          <div class="zone-copy">
+            <div class="zone-kicker"><span id="zone-tier">Tier I</span><span class="dot-sep"></span><span id="zone-status">Hunt in progress</span></div>
+            <h2 id="zone-name">Ashen Crypts</h2>
+            <p id="zone-desc">Where the first oath was broken.</p>
+          </div>
+          <button class="ghost-btn zone-travel-btn" id="zone-travel-btn">
+            <svg class="icon"><use href="#i-map"/></svg><span>Travel</span>
+          </button>
+        </div>
+
+        <div class="boss-track" title="Defeat regular monsters to draw out the zone boss">
+          <div class="boss-track-label">
+            <span><svg class="icon"><use href="#i-skull"/></svg> <span id="boss-track-text">Boss stirs in 10 kills</span></span>
+            <span id="boss-track-pips" class="boss-pips"></span>
+          </div>
+          <div class="bar boss-bar"><div class="bar-fill" id="boss-progress-fill"></div></div>
+        </div>
+
+        <div class="arena" id="arena" data-zone="0">
+          <div class="arena-vignette"></div>
+          <div class="arena-moon"></div>
+          <div class="arena-stars"></div>
+          <svg class="arena-ruins" viewBox="0 0 900 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+            <path d="M0 337h105V225l20-11 19 11v112h44V180l26-15 26 15v157h86V250l18-12 18 12v87h84V140l31-19 31 19v197h74V242l17-11 17 11v95h76V185l24-14 24 14v152h88V235l18-11 18 11v102h98" fill="currentColor" opacity=".36"/>
+            <path d="M0 337h900v83H0z" fill="#070909"/>
+            <path d="M0 350c140-14 240 2 348-8 130-12 214 9 322-2 90-9 162 2 230-4v40H0v-26Z" fill="#0d1010" opacity=".9"/>
+            <g fill="none" stroke="currentColor" opacity=".17">
+              <path d="M130 226h28M144 226v-33M684 238h34M701 238v-42M382 176h38M401 176v-42"/>
+            </g>
+          </svg>
+          <div class="fog fog-a"></div>
+          <div class="fog fog-b"></div>
+          <div class="arena-embers" id="arena-embers" aria-hidden="true"></div>
+          <div class="summon-circle" aria-hidden="true"></div>
+
+          <div class="arena-hud-top">
+            <span class="arena-chip" id="arena-difficulty">Threat: Low</span>
+            <span class="arena-chip subtle" id="arena-killstreak">0 slain here</span>
+          </div>
+
+          <button class="enemy-wrap" id="enemy-wrap" type="button" aria-label="Strike the enemy">
+            <span class="reticle reticle-a"></span>
+            <span class="reticle reticle-b"></span>
+            <span class="enemy-aura"></span>
+            <span class="enemy-art" id="enemy-art"></span>
+            <span class="enemy-shadow"></span>
+            <span class="enemy-boss-crown" id="enemy-boss-crown" aria-hidden="true">
+              <svg viewBox="0 0 80 48"><path d="M6 39 11 10l17 12L40 4l12 18 17-12 5 29H6Z" fill="currentColor" opacity=".9"/><path d="M11 42h58" stroke="currentColor" stroke-width="3"/></svg>
+            </span>
+            <span class="enemy-click-spark"></span>
+          </button>
+          <div class="fx-layer" id="fx-layer" aria-hidden="true"></div>
+          <div class="combat-banner" id="combat-banner" aria-live="polite"></div>
+          <div class="click-hint" id="click-hint"><span class="mouse-glyph"></span> Click the creature to strike <kbd>Space</kbd></div>
+        </div>
+
+        <div class="enemy-info">
+          <div class="enemy-name-row">
+            <div>
+              <span class="enemy-rank" id="enemy-rank">Lesser Fiend</span>
+              <h3 id="enemy-name">Grave Wisp <span id="enemy-level">Lv. 1</span></h3>
+            </div>
+            <div class="enemy-tags">
+              <span class="boss-chip" id="enemy-boss-chip">Boss</span>
+              <span class="reward-chip" title="Rewards"><svg class="icon"><use href="#i-coin"/></svg><span id="enemy-gold-reward">0</span></span>
+              <span class="reward-chip xp-chip" title="Experience"><svg class="icon"><use href="#i-star"/></svg><span id="enemy-xp-reward">0</span></span>
+            </div>
+          </div>
+          <div class="bar enemy-hp-bar"><div class="bar-fill" id="enemy-hp-fill"></div><span class="bar-text" id="enemy-hp-text">0 / 0</span></div>
+          <div class="enemy-subrow">
+            <span id="enemy-trait">It watches from the dark.</span>
+            <span id="enemy-hp-percent">100%</span>
+          </div>
+        </div>
+
+        <div class="battle-actions">
+          <button class="auto-btn" id="auto-btn" type="button">
+            <span class="auto-icon"><svg class="icon"><use href="#i-flash"/></svg></span>
+            <span class="auto-copy"><strong>Auto-Strike</strong><small id="auto-status">Locked</small></span>
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </button>
+          <button class="strike-btn" id="strike-btn" type="button">
+            <span>Strike</span><kbd>Space</kbd>
+          </button>
+        </div>
+
+        <div class="combat-log">
+          <div class="combat-log-heading"><span>Chronicle</span><span class="live-dot"></span></div>
+          <ul id="combat-log" aria-live="polite"></ul>
+        </div>
+      </section>
+
+      <aside class="panel side-panel" aria-label="Inventory, forge, and upgrades">
+        <nav class="tabs" role="tablist" aria-label="Character menus">
+          <button class="tab active" role="tab" aria-selected="true" data-tab="inventory" id="tab-inventory">
+            <svg class="icon"><use href="#i-bag"/></svg><span>Satchel</span><b class="tab-count" id="inventory-tab-count">0</b>
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="forge" id="tab-forge">
+            <svg class="icon"><use href="#i-anvil"/></svg><span>Forge</span><b class="forge-ready-badge hidden" id="forge-ready-badge">!</b>
+          </button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="upgrades" id="tab-upgrades">
+            <svg class="icon"><use href="#i-arrow-up"/></svg><span>Upgrades</span>
+          </button>
+        </nav>
+
+        <section class="tab-panel active" data-panel="inventory" aria-labelledby="tab-inventory">
+          <div class="tab-title-row">
+            <div><span class="eyebrow">Relics recovered</span><h3>Satchel</h3></div>
+            <span class="capacity" id="inventory-count">0 / 60</span>
+          </div>
+          <div class="inventory-toolbar">
+            <label class="select-wrap">
+              <span class="sr-only">Sort inventory</span>
+              <select id="sort-select">
+                <option value="power">Sort: Power</option>
+                <option value="rarity">Sort: Rarity</option>
+                <option value="newest">Sort: Newest</option>
+                <option value="slot">Sort: Type</option>
+              </select>
+            </label>
+            <button class="mini-btn" id="sell-commons-btn" title="Sell all unequipped Common items">Sell Commons</button>
+          </div>
+          <div class="inventory-grid" id="inventory-grid"></div>
+          <div class="empty-state" id="inventory-empty">
+            <span class="empty-rune">◇</span>
+            <h4>Your satchel is empty</h4>
+            <p>Slay monsters to recover weapons and armor.</p>
+          </div>
+          <div class="inventory-footer">
+            <p><span class="dot green"></span> Click a relic to inspect, equip, sell, or compare it.</p>
+          </div>
+        </section>
+
+        <section class="tab-panel" data-panel="forge" aria-labelledby="tab-forge">
+          <div class="tab-title-row">
+            <div><span class="eyebrow">Three become one</span><h3>Relic Forge</h3></div>
+            <span class="forge-mark"><svg class="icon"><use href="#i-anvil"/></svg></span>
+          </div>
+          <div class="forge-intro">
+            <p>Combine <b>3 unequipped items</b> of the same slot and rarity to birth the next rarity.</p>
+            <div class="rarity-chain" id="rarity-chain"></div>
+          </div>
+          <div class="forge-groups" id="forge-groups"></div>
+          <div class="empty-state" id="forge-empty">
+            <span class="empty-rune">⚒</span>
+            <h4>No fusions ready</h4>
+            <p>Gather three relics of the same type and rarity. The forge handles the rest.</p>
+          </div>
+        </section>
+
+        <section class="tab-panel" data-panel="upgrades" aria-labelledby="tab-upgrades">
+          <div class="tab-title-row">
+            <div><span class="eyebrow">Spend your spoils</span><h3>Eternal Upgrades</h3></div>
+            <div class="gold-mini"><svg class="icon"><use href="#i-coin"/></svg><span id="upgrade-gold">0</span></div>
+          </div>
+          <div class="upgrade-summary">
+            <div><span>Damage</span><strong id="up-summary-damage">0</strong></div>
+            <div><span>Speed</span><strong id="up-summary-speed">0%</strong></div>
+            <div><span>Fortune</span><strong id="up-summary-fortune">0</strong></div>
+          </div>
+          <div class="upgrade-list" id="upgrade-list"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="game-footer">
+      <span class="footer-brand">ASHEN OATH <i>·</i> CHAPTER I</span>
+      <span class="footer-tip" id="footer-tip"><kbd>Space</kbd> strike · <kbd>M</kbd> map · Progress saves automatically</span>
+      <span class="save-state" id="save-state"><span class="save-dot"></span> Saved</span>
+    </footer>
+  </div>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+    <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal-shell">
+      <button class="modal-close" id="modal-close" aria-label="Close dialog"><svg class="icon"><use href="#i-close"/></svg></button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <div class="sr-only" id="sr-announcer" aria-live="assertive"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
