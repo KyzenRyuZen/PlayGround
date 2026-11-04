@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#15231b" />
+  <meta name="description" content="Hollowbrook — a tiny pixel-art fantasy adventure." />
+  <title>Hollowbrook — A Little Tale of Light</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main id="app">
+    <canvas id="game" aria-label="Hollowbrook game world" role="img"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="sun-wash" aria-hidden="true"></div>
+
+    <header class="hud hud-top" aria-live="polite">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M12 2.8 19 8v8l-7 5.2L5 16V8l7-5.2Z" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M12 6.2v11.5M7.4 9.3l9.2 5.4M16.6 9.3l-9.2 5.4" stroke="currentColor" stroke-width=".8" opacity=".55"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>Hollowbrook</strong>
+          <small>A little tale of light</small>
+        </span>
+      </div>
+
+      <div class="quest" id="quest">
+        <span class="quest-label" id="quest-label">Starblooms · 0 / 6</span>
+        <div class="bloom-track" id="bloom-track" aria-label="0 of 6 starblooms gathered"></div>
+      </div>
+
+      <button class="icon-button" id="sound-toggle" type="button" aria-label="Mute sound" aria-pressed="false">
+        <svg class="sound-on" viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+          <path d="M4 9.5h3.2L12 5.8v12.4l-4.8-3.7H4V9.5Z" fill="currentColor"/>
+          <path d="M15.2 8.6a5 5 0 0 1 0 6.8M17.9 6.2a8.4 8.4 0 0 1 0 11.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <svg class="sound-off" viewBox="0 0 24 24" width="19" height="19" fill="none" aria-hidden="true">
+          <path d="M4 9.5h3.2L12 5.8v12.4l-4.8-3.7H4V9.5Z" fill="currentColor"/>
+          <path d="m15.4 9.4 4.6 5.2M20 9.4l-4.6 5.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="joystick-wrap" id="joystick-wrap" aria-hidden="true">
+      <div class="joystick" id="joystick">
+        <div class="joystick-ring"></div>
+        <div class="joystick-knob" id="joystick-knob">
+          <span></span>
+        </div>
+        <div class="joystick-runes">
+          <i class="north"></i><i class="east"></i><i class="south"></i><i class="west"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="desktop-hint" id="desktop-hint">
+      <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>or arrow keys to wander</span>
+    </div>
+
+    <div class="compass" id="compass" aria-hidden="true">
+      <span class="compass-needle"></span>
+      <em>N</em>
+    </div>
+
+    <section class="title-screen" id="title-screen" aria-label="Start screen">
+      <div class="title-glow" aria-hidden="true"></div>
+      <div class="title-frame">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <p class="eyebrow"><span></span>Chapter I<span></span></p>
+        <h1>Hollowbrook</h1>
+        <p class="subtitle">A little tale of light</p>
+        <div class="title-rule"><i></i><b>✦</b><i></i></div>
+        <p class="story">The starblooms have gone quiet, and the old shrine<br class="wide-only" /> at the edge of the woods is fast asleep.</p>
+        <button id="start-button" class="start-button" type="button">
+          <span class="btn-glint"></span>
+          <span class="btn-label">Start</span>
+          <span class="btn-sub">wander the valley</span>
+        </button>
+        <div class="controls-card">
+          <div class="control">
+            <span class="mini-stick" aria-hidden="true"><i></i></span>
+            <span><strong>Drag</strong> to walk</span>
+          </div>
+          <div class="control-divider"></div>
+          <div class="control">
+            <span class="mini-keys" aria-hidden="true"><b>W</b><b>A</b><b>S</b><b>D</b></span>
+            <span><strong>Keys</strong> to roam</span>
+          </div>
+        </div>
+        <p class="title-foot">Gather six starblooms hidden in the valley</p>
+      </div>
+    </section>
+
+    <section class="win-banner" id="win-banner" aria-live="polite">
+      <div class="win-rays" aria-hidden="true"></div>
+      <p class="win-eyebrow">The valley remembers</p>
+      <h2>The shrine is awake</h2>
+      <p>All six starblooms are home. Hollowbrook glows again.</p>
+      <button class="win-dismiss" id="win-dismiss" type="button">Keep exploring</button>
+    </section>
+
+    <div class="fatal" id="fatal" hidden>
+      <p>Hollowbrook could not wake up.</p>
+      <small id="fatal-message"></small>
+    </div>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
