@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#183629" />
+  <meta name="description" content="Mosswold Vale — a cozy pixel-art fantasy village to wander." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231b3a2b'/%3E%3Cpath d='M16 5c-4.4 0-7.5 3-7.5 7 0 2 1 3.6 2.3 5.2C9.2 19 7.7 21.2 7.7 24h16.6c0-2.8-1.5-5-3.1-6.8 1.2-1.6 2.3-3.2 2.3-5.2 0-4-3.1-7-7.5-7Z' fill='%238fd08a'/%3E%3Cpath d='M16 9v13' stroke='%231b3a2b' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <title>Mosswold Vale</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main id="app" aria-label="Mosswold Vale, a top-down pixel-art exploration game">
+    <canvas id="game-canvas" aria-label="The village of Mosswold Vale"></canvas>
+
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <header class="hud">
+      <div class="place-card">
+        <div class="rune" aria-hidden="true">
+          <svg viewBox="0 0 32 32" role="presentation">
+            <path d="M16 4c-4.6 0-8 3-8 7 0 2.2 1.1 3.9 2.4 5.6C8.6 18.7 7 21 7 24h18c0-3-1.6-5.3-3.4-7.4C22.9 14.9 24 13.2 24 11c0-4-3.4-7-8-7Z" fill="currentColor"/>
+            <path d="M16 8v14M12 11l4 3 4-3" fill="none" stroke="#183629" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="place-text">
+          <p class="eyebrow">Mosswold Vale</p>
+          <p class="subtitle">The village at first light</p>
+        </div>
+      </div>
+
+      <div class="found-card" aria-live="polite">
+        <span class="found-gem" aria-hidden="true"></span>
+        <span class="found-label">Found</span>
+        <span class="found-count"><span id="found-count">0</span><span class="found-total">/4</span></span>
+      </div>
+    </header>
+
+    <section id="intro" class="intro" aria-hidden="true">
+      <p class="intro-kicker">Chapter I</p>
+      <h1>Mosswold Vale</h1>
+      <p class="intro-sub">Wander the village at first light</p>
+      <div class="intro-rule" aria-hidden="true"><span></span></div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite">
+      <span class="toast-gem" aria-hidden="true"></span>
+      <span class="toast-copy">
+        <span class="toast-kicker">Landmark discovered</span>
+        <strong id="toast-title">The Old Well</strong>
+      </span>
+    </div>
+
+    <div class="controls">
+      <div id="joystick" class="joystick" role="application" aria-label="Movement joystick. Drag to walk.">
+        <div class="joystick-halo" aria-hidden="true"></div>
+        <div class="joystick-base" aria-hidden="true">
+          <span class="joy-tick joy-tick-up"></span>
+          <span class="joy-tick joy-tick-right"></span>
+          <span class="joy-tick joy-tick-down"></span>
+          <span class="joy-tick joy-tick-left"></span>
+          <span class="joy-ring"></span>
+          <span class="joy-knob"><span class="joy-knob-glint"></span></span>
+        </div>
+      </div>
+
+      <div class="hint" aria-hidden="true">
+        <span class="hint-key desktop-only">WASD <i>/</i> arrow keys</span>
+        <span class="hint-key touch-only">Drag the ring to wander</span>
+      </div>
+    </div>
+
+    <div class="corner corner-bl" aria-hidden="true"></div>
+    <div class="corner corner-br" aria-hidden="true"></div>
+
+    <noscript>
+      <div class="noscript">This little world needs JavaScript enabled to wake up.</div>
+    </noscript>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
