@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0912" />
+  <meta name="description" content="Aetheria — a playable mobile-first isometric fantasy MMORPG-style adventure." />
+  <title>Aetheria — Fantasy MMORPG</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="gameCanvas" aria-label="Aetheria game world"></canvas>
+    <div id="vignette"></div>
+
+    <!-- ================= HUD ================= -->
+    <div id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="hud-left">
+          <div class="portrait-card" id="portraitCard">
+            <div class="portrait-ring"><span id="portraitIcon">⚔</span></div>
+            <div class="portrait-meta">
+              <div class="char-name" id="hudName">Wanderer</div>
+              <div class="char-sub"><span id="hudClass">Warrior</span> · Lv <b id="hudLevel">1</b></div>
+            </div>
+          </div>
+          <div class="bars">
+            <div class="bar hp"><div class="bar-fill" id="hpFill"></div><span id="hpText">100 / 100</span></div>
+            <div class="bar mana"><div class="bar-fill" id="manaFill"></div><span id="manaText">50 / 50</span></div>
+            <div class="bar xp"><div class="bar-fill" id="xpFill"></div><span id="xpText">0 / 100</span></div>
+          </div>
+          <div class="region-chip" id="regionChip"><span class="chev">◈</span><span id="hudRegion">Greendale</span></div>
+        </div>
+        <div class="hud-right">
+          <div class="resource-pills">
+            <div class="pill gold" title="Gold"><span>◉</span><b id="hudGold">0</b></div>
+            <div class="pill gems" title="Gems"><span>◆</span><b id="hudGems">0</b></div>
+          </div>
+          <div class="quick-row">
+            <button class="quick-btn" data-ui="openBag" title="Inventory (B)"><span>🎒</span><i>Bag</i></button>
+            <button class="quick-btn" data-ui="openCharacter" title="Character (C)"><span>🛡</span><i>Hero</i></button>
+            <button class="quick-btn" data-ui="openMap" title="World Map (M)"><span>🗺</span><i>Map</i></button>
+            <button class="quick-btn" data-ui="openShop" title="Shop"><span>🛒</span><i>Shop</i></button>
+            <button class="quick-btn" data-ui="openMenu" title="Menu"><span>☰</span><i>Menu</i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="minimap-wrap">
+        <canvas id="minimap" width="122" height="122"></canvas>
+        <div class="minimap-label"><span id="minimapRegion">Greendale</span><em id="minimapCoords"></em></div>
+      </div>
+
+      <div id="questTracker" class="quest-tracker hidden">
+        <div class="qt-head"><span class="qt-icon">❖</span><span id="qtTitle">Quest</span></div>
+        <div id="qtDesc" class="qt-desc"></div>
+        <div class="qt-progress"><div id="qtFill"></div></div>
+        <div id="qtCount" class="qt-count"></div>
+      </div>
+
+      <div id="bossBar" class="boss-bar hidden">
+        <div class="boss-title"><span id="bossName">Boss</span><em id="bossLevel">Lv 1</em></div>
+        <div class="boss-track"><div id="bossFill"></div></div>
+      </div>
+
+      <div id="eventFeed" class="event-feed"></div>
+
+      <div id="interactPrompt" class="interact-prompt hidden"><span class="key">E</span><span id="interactText">Interact</span></div>
+
+      <div id="controls">
+        <div id="joystick" class="joystick">
+          <div class="joy-ring"></div>
+          <div class="joy-knob" id="joyKnob"></div>
+          <div class="joy-hint">MOVE</div>
+        </div>
+
+        <div class="action-cluster">
+          <button id="btnInteract" class="act act-interact" title="Interact (E)"><span>✦</span><i>Interact</i></button>
+          <button id="btnPotion" class="act act-potion" title="Health Potion (H)"><span>🧪</span><i id="potionCount">0</i></button>
+          <button id="btnSkill" class="act act-skill" title="Class Skill (Q)">
+            <span id="skillIcon">⚔</span><i id="skillName">Skill</i>
+            <div class="cooldown-mask" id="skillCdMask"></div>
+            <div class="cooldown-text" id="skillCdText"></div>
+          </button>
+          <button id="btnAttack" class="act act-attack" title="Attack (Space)"><span>⚔</span><i>Attack</i></button>
+          <button id="btnMount" class="act act-mini act-mount" title="Mount (R)"><span>🐎</span><i>Mount</i></button>
+          <button id="btnAuto" class="act act-mini act-auto" title="Auto Attack (F)"><span>⟳</span><i>Auto</i></button>
+        </div>
+      </div>
+
+      <div id="deathFlash" class="death-flash"></div>
+    </div>
+
+    <!-- ================= START ================= -->
+    <section id="startScreen" class="start-screen">
+      <div class="stars" id="titleStars"></div>
+      <div class="start-inner">
+        <div class="start-art">
+          <canvas id="titlePreview" width="280" height="360"></canvas>
+        </div>
+        <div class="start-copy">
+          <div class="eyebrow">AN ISOMETRIC FANTASY ADVENTURE</div>
+          <h1 class="logo">AETHERIA</h1>
+          <p class="tagline">Angels and demons share one wounded world.<br />Eight regions. Nine slots. One skill. Endless gold.</p>
+          <div class="start-buttons">
+            <button id="btnContinue" class="btn btn-primary hidden">Continue Journey</button>
+            <button id="btnNewGame" class="btn btn-primary">New Adventure</button>
+            <button id="btnHowTo" class="btn btn-ghost">How to Play</button>
+          </div>
+          <div class="start-meta">
+            <span>v1.0 · Local save</span>
+            <span>Single-player simulation</span>
+          </div>
+        </div>
+      </div>
+      <div class="start-footer">
+        <span>Pixel-forged in the browser</span>
+        <span>No account required · No real-money charges</span>
+      </div>
+    </section>
+
+    <!-- ================= CHARACTER CREATION ================= -->
+    <section id="creationScreen" class="creation-screen hidden">
+      <div class="creation-shell">
+        <header class="creation-head">
+          <div>
+            <div class="eyebrow">CHOOSE YOUR SOUL</div>
+            <h2>Create Your Hero</h2>
+          </div>
+          <button id="creationBack" class="icon-btn" aria-label="Back">✕</button>
+        </header>
+        <div class="creation-body">
+          <div class="creation-preview">
+            <canvas id="createPreview" width="280" height="360"></canvas>
+            <div class="preview-name" id="previewName">Wanderer</div>
+            <div class="preview-sub" id="previewSub">Angel · Warrior</div>
+            <div class="preview-stats" id="previewStats"></div>
+          </div>
+          <div class="creation-form">
+            <label class="field">
+              <span>Name</span>
+              <input id="createName" type="text" maxlength="16" placeholder="Enter a name" value="Wanderer" autocomplete="off" />
+            </label>
+
+            <div class="opt-group">
+              <div class="opt-label">Faction <em>Unique appearance, wings & designs</em></div>
+              <div class="choice-row" id="factionChoices"></div>
+            </div>
+
+            <div class="opt-group">
+              <div class="opt-label">Class <em>One signature skill, 10 levels</em></div>
+              <div class="choice-row class-row" id="classChoices"></div>
+            </div>
+
+            <div class="opt-group two-col">
+              <div>
+                <div class="opt-label">Body</div>
+                <div class="choice-row" id="genderChoices"></div>
+              </div>
+              <div>
+                <div class="opt-label">Eyes</div>
+                <div class="choice-row" id="eyeChoices"></div>
+              </div>
+            </div>
+
+            <div class="opt-group">
+              <div class="opt-label">Hairstyle <em>5 per body · more in shop</em></div>
+              <div class="choice-row hair-row" id="hairChoices"></div>
+            </div>
+
+            <div class="opt-group">
+              <div class="opt-label">Hair color</div>
+              <div class="choice-row" id="hairColorChoices"></div>
+            </div>
+
+            <button id="btnCreate" class="btn btn-primary btn-wide">Enter Aetheria</button>
+            <p class="fine">Wings unlock through the main questline or the cosmetic shop. They are never dropped or traded.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= LOADING ================= -->
+    <section id="loadingScreen" class="loading-screen hidden">
+      <div class="loading-bg"></div>
+      <div class="loading-inner">
+        <div class="loading-kicker">TRAVELLING THE LEYLINES</div>
+        <h2 id="loadingRegion">Greendale</h2>
+        <div class="loading-epithet" id="loadingEpithet">Where the World Wakes</div>
+        <p class="loading-lore" id="loadingLore"></p>
+        <div class="loading-track"><div id="loadingFill"></div></div>
+        <div class="loading-hint" id="loadingHint">Entering the region…</div>
+      </div>
+      <div class="loading-runes">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ</div>
+    </section>
+
+    <!-- ================= MODAL ================= -->
+    <div id="modalRoot" class="modal-root hidden">
+      <div class="modal-backdrop" data-close="1"></div>
+      <div class="modal-sheet" id="modalSheet" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <div class="modal-title-wrap"><span id="modalIcon">✦</span><h3 id="modalTitle">Panel</h3></div>
+          <button class="icon-btn" data-close="1" aria-label="Close">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+    <div id="toastHost" class="toast-host"></div>
+    <div id="deathOverlay" class="death-overlay hidden">
+      <div class="death-word">YOU HAVE FALLEN</div>
+      <p>Your gear is safe. The shrine is calling you home.</p>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
