@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0e1a">
+<title>AETHERIA — Fantasy MMORPG</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='24' font-size='24'>⚔️</text></svg>">
+</head>
+<body>
+<div id="app">
+  <!-- Loading -->
+  <div id="loadingScreen" class="screen">
+    <div class="load-title">AETHERIA</div>
+    <div class="load-sub">Realms of Angels &amp; Demons</div>
+    <div class="load-bar"><div id="loadFill"></div></div>
+    <div id="loadText" class="load-text">Awakening the realms…</div>
+  </div>
+
+  <!-- Main Menu -->
+  <div id="menuScreen" class="screen hidden">
+    <div class="menu-bg" id="menuBgCanvas"></div>
+    <div class="menu-title"><span class="a1">A</span><span class="a2">E</span><span class="a3">T</span><span class="a4">H</span><span class="a5">E</span><span class="a6">R</span><span class="a7">I</span><span class="a8">A</span></div>
+    <div class="menu-sub">Choose your fate. Save the realms.</div>
+    <div class="menu-btns">
+      <button id="btnContinue" class="mbtn primary hidden">Continue</button>
+      <button id="btnNewGame" class="mbtn primary">New Game</button>
+      <button id="btnWipe" class="mbtn danger hidden">Delete Character</button>
+    </div>
+    <div class="menu-note">Local single-device demo — multiplayer architecture stubs are server-ready.</div>
+  </div>
+
+  <!-- Character Creation -->
+  <div id="createScreen" class="screen hidden">
+    <div class="create-head">
+      <div class="create-step" id="createStep">Step 1 / 4</div>
+      <div class="create-title" id="createTitle">Name your hero</div>
+    </div>
+    <div class="create-body" id="createBody"></div>
+    <div class="create-foot">
+      <button id="btnCreateBack" class="cbtn ghost">Back</button>
+      <button id="btnCreateNext" class="cbtn primary">Next</button>
+    </div>
+  </div>
+
+  <!-- Game -->
+  <div id="gameScreen" class="screen hidden">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Top HUD -->
+    <div class="hud-top">
+      <div class="hud-left">
+        <div class="unit-bars">
+          <div class="barrow"><div class="bar hp"><div id="barHP"></div><span id="hpText">100/100</span></div></div>
+          <div class="barrow"><div class="bar mp"><div id="barMP"></div><span id="mpText">50/50</span></div></div>
+          <div class="barrow"><div class="bar xp"><div id="barXP"></div><span id="xpText">Lv 1</span></div></div>
+        </div>
+        <div class="currency">
+          <span class="cur gold" id="curGold">0</span>
+          <span class="cur gem" id="curGems">0</span>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="minimap-wrap">
+          <canvas id="minimap" width="124" height="124"></canvas>
+          <div class="region-name" id="regionName">Greendale</div>
+        </div>
+        <div class="top-icons">
+          <button class="ibtn" id="btnChar" aria-label="Character">👤</button>
+          <button class="ibtn" id="btnInv" aria-label="Inventory">🎒</button>
+          <button class="ibtn" id="btnEquip" aria-label="Equipment">⚔️</button>
+          <button class="ibtn" id="btnQuests" aria-label="Quests">📜</button>
+          <button class="ibtn" id="btnShop" aria-label="Shop">🛍️</button>
+          <button class="ibtn" id="btnMenu" aria-label="Menu">☰</button>
+        </div>
+        <div class="quest-tracker" id="questTracker"></div>
+      </div>
+    </div>
+
+    <!-- Bottom: joystick + action buttons -->
+    <div class="hud-bottom">
+      <div id="joystickZone" class="joystick-zone">
+        <div id="joyBase" class="joy-base"><div id="joyStick" class="joy-stick"></div></div>
+      </div>
+      <div class="action-cluster">
+        <div class="small-actions">
+          <button class="abtn small" id="btnPotHP" aria-label="HP Potion"><span>🧪</span><b id="potHPCount">0</b></button>
+          <button class="abtn small" id="btnPotMP" aria-label="MP Potion"><span>💧</span><b id="potMPCount">0</b></button>
+          <button class="abtn small" id="btnMount" aria-label="Mount"><span>🐎</span></button>
+          <button class="abtn small" id="btnAuto" aria-label="Auto attack"><span>⚙️</span><i>AUTO</i></button>
+        </div>
+        <div class="main-actions">
+          <button class="abtn skill" id="btnSkill"><span id="skillIcon">✨</span><i id="skillCd"></i><em id="skillName">SKILL</em></button>
+          <button class="abtn attack" id="btnAttack"><span>⚔️</span></button>
+        </div>
+        <button class="abtn interact hidden" id="btnInteract"><span>💬</span><i id="interactLabel">Talk</i></button>
+      </div>
+    </div>
+
+    <div id="toastWrap"></div>
+    <div id="pickupLog"></div>
+  </div>
+
+  <!-- Generic modal -->
+  <div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+  <!-- NPC Dialog -->
+  <div id="dialog" class="dialog hidden">
+    <div class="dialog-box">
+      <div class="dialog-portrait" id="dlgPortrait">🙂</div>
+      <div class="dialog-main">
+        <div class="dialog-name" id="dlgName">NPC</div>
+        <div class="dialog-text" id="dlgText">…</div>
+        <div class="dialog-opts" id="dlgOpts"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/world.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
