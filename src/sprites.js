@@ -631,11 +631,13 @@ export function drawEnemy(ctx, e, time) {
   const c = def.color || '#7bd66b';
   const dark = shade(c, -0.22);
   const light = shade(c, 0.18);
-  const bob = Math.sin(time * 3 + e.anim) * (kind === 'ghost' ? 3 : 1);
+  const run = e.state === 'chase' ? Math.sin(time * 11 + (e.anim || 0) * 6) : Math.sin(time * 2.4 + (e.anim || 0) * 1.2) * 0.25;
+  const atk = e.attackAnim ? Math.sin(e.attackAnim * Math.PI) : 0;
+  const bob = Math.sin(time * 3 + e.anim) * (kind === 'ghost' ? 3 : 1) - (e.state === 'chase' ? Math.abs(run) * 0.7 : 0);
   const s = e.scale || 1;
   ctx.save();
   ctx.scale((e.facing || 1) * s, s);
-  ctx.translate(0, bob);
+  ctx.translate(atk * 3.2, bob);   // lunge forward during an attack swing
   const flash = e.hitFlash > 0;
   const C = (col) => flash ? '#fff6e0' : col;
 
@@ -658,7 +660,7 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -13, -13, 4, 3, C(dark));
       p(ctx, -6, -20, 2, 4, C(dark)); p(ctx, 0, -20, 2, 4, C(dark));
       p(ctx, -3, -15, 2, 2, '#ffd166'); p(ctx, 1, -15, 2, 2, '#ffd166');
-      p(ctx, -8, -3, 3, 4, C(dark)); p(ctx, 3, -3, 3, 4, C(dark));
+      p(ctx, -9, -4, 3, 4 + run, C(dark)); p(ctx, 2, -4, 3, 4 - run, C(dark));
       p(ctx, -2, -13, 3, 1, '#f7f0dc');
       // tail
       p(ctx, 8, -15, 4, 2, C(dark)); p(ctx, 11, -18, 2, 4, C(dark));
@@ -673,9 +675,10 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -4, -35, 8, 9, C('#d6a37a'));
       p(ctx, -5, -37, 10, 4, metal);
       p(ctx, -3, -31, 2, 2, '#1b141d'); p(ctx, 2, -31, 2, 2, '#1b141d');
-      // weapon
-      p(ctx, 8, -30, 2, 20, '#8a6a45');
-      p(ctx, 6, -32, 6, 2, '#c7ccd6');
+      // weapon raises over the head while striking
+      const wr = Math.round(atk * 4);
+      p(ctx, 8, -30 - wr, 2, 20, '#8a6a45');
+      p(ctx, 6, -32 - wr, 6, 2, '#c7ccd6');
       break;
     }
     case 'tree': {
@@ -697,7 +700,7 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -12, -8, 4, 3, '#f2e5c8');
       p(ctx, -12, -8, 2, 4, '#f7f0dc');
       p(ctx, -7, -16, 2, 2, '#ff5a3c');
-      p(ctx, -9, -3, 3, 4, C(dark)); p(ctx, 2, -3, 3, 4, C(dark));
+      p(ctx, -9, -3, 3, 4 + run, C(dark)); p(ctx, 2, -3, 3, 4 - run, C(dark));
       p(ctx, -3, -10, 2, 2, '#5a3a24');
       break;
     }
@@ -761,8 +764,9 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -3, -32, 2, 2, '#3c2f55'); p(ctx, 2, -32, 2, 2, '#3c2f55');
       p(ctx, -1, -28, 2, 1, '#3c2f55');
       // sword
-      p(ctx, 8, -29, 2, 18, '#c7ccd6');
-      p(ctx, 6, -13, 6, 2, '#8a6a45');
+      const ws = Math.round(atk * 4);
+      p(ctx, 8, -29 - ws, 2, 18, '#c7ccd6');
+      p(ctx, 6, -13 - ws, 6, 2, '#8a6a45');
       // cape
       p(ctx, -8, -25, 3, 16, C(dark));
       break;
@@ -772,7 +776,7 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -14, -16, 7, 6, C(dark));
       p(ctx, -9, -19, 4, 5, C(dark)); p(ctx, -2, -20, 4, 5, C(dark));
       p(ctx, -6, -15, 3, 3, '#ff4d6d'); p(ctx, 2, -15, 3, 3, '#ff4d6d');
-      p(ctx, -9, -3, 3, 4, C(dark)); p(ctx, 4, -3, 3, 4, C(dark));
+      p(ctx, -9, -3, 3, 4 + run, C(dark)); p(ctx, 4, -3, 3, 4 - run, C(dark));
       p(ctx, -4, -11, 8, 2, C(light));
       p(ctx, 10, -18, 4, 2, C(dark)); p(ctx, 13, -14, 2, 6, C(dark));
       break;
@@ -801,7 +805,7 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -9, -14, 18, 10, C(c));
       p(ctx, -6, -17, 12, 5, C(light));
       p(ctx, -2, -17, 4, 8, C(dark));
-      for (const sx of [-8, -4, 4, 8]) { p(ctx, sx, -6, 2, 5, C(dark)); }
+      for (const sx of [-8, -4, 4, 8]) { p(ctx, sx, -6, 2, 5 + (sx < 0 ? run : -run), C(dark)); }
       p(ctx, -7, -20, 2, 3, C(dark)); p(ctx, 5, -20, 2, 3, C(dark));
       p(ctx, -3, -12, 6, 3, 'rgba(255,230,150,0.5)');
       break;
@@ -856,10 +860,11 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -6, -36, 12, 9, C(shade(c, -0.1)));
       p(ctx, -4, -33, 8, 2, '#ff5a3c');
       p(ctx, -10, -30, 4, 7, C(dark)); p(ctx, 6, -30, 4, 7, C(dark));
-      // great axe
-      p(ctx, 10, -33, 2, 28, '#4a2b2b');
-      p(ctx, 7, -34, 8, 6, '#aab2c2');
-      p(ctx, 7, -30, 8, 2, '#e8ecf4');
+      // great axe raises while striking
+      const wa = Math.round(atk * 3);
+      p(ctx, 10, -33 - wa, 2, 28, '#4a2b2b');
+      p(ctx, 7, -34 - wa, 8, 6, '#aab2c2');
+      p(ctx, 7, -30 - wa, 8, 2, '#e8ecf4');
       break;
     }
     case 'sentinel': {
@@ -944,61 +949,104 @@ export function drawProp(ctx, prop, time, biome = {}) {
       const leaf = biome.leaf || '#4f8a4b';
       const leaf2 = shade(leaf, 0.14);
       const leaf3 = shade(leaf, -0.2);
+      const leaf4 = shade(leaf, 0.24);
+      const sway = Math.sin(time * 1.4 + v * 0.7) * 0.7;
+      const sway2 = Math.sin(time * 1.4 + v * 0.7 + 0.9) * 0.9;
+      // trunk with moss and root flare
       p(ctx, -3, -18, 6, 18, '#6a4a2f');
+      p(ctx, -3, -18, 2, 18, '#7d5836');
+      p(ctx, -5, -14, 3, 3, '#5a8a3e');           // moss clump
+      p(ctx, 2, -8, 2, 2, shade('#5a8a3e', -0.1));
       p(ctx, -5, -14, 4, 2, '#5a3f27');
-      p(ctx, -12, -30, 24, 14, leaf3);
-      p(ctx, -10, -38, 20, 12, leaf);
-      p(ctx, -7, -44, 14, 9, leaf2);
-      p(ctx, -3, -47, 8, 5, shade(leaf, 0.22));
-      p(ctx, -16, -26, 9, 8, leaf3);
-      p(ctx, 8, -28, 7, 7, leaf);
-      p(ctx, 4, -36, 5, 3, leaf2);
-      p(ctx, -8, -41, 4, 2, 'rgba(255,255,255,0.12)');
+      p(ctx, -2, -1, 10, 2, '#5a3f27');           // root flare
+      // crown layers (sway with the wind)
+      p(ctx, -18 + sway, -26, 9, 8, leaf3);
+      p(ctx, 9 + sway, -28, 7, 7, leaf);
+      p(ctx, -12 + sway, -30, 24, 14, leaf3);
+      p(ctx, -10 + sway, -38, 20, 12, leaf);
+      p(ctx, -7 + sway2, -44, 14, 9, leaf2);
+      p(ctx, -3 + sway2, -47, 8, 5, shade(leaf, 0.3));
+      p(ctx, 4 + sway, -36, 5, 3, leaf2);
+      p(ctx, 12 + sway, -33, 5, 4, shade(leaf, 0.2));
+      // sunlit edge + shadowed underside
+      p(ctx, -12 + sway, -30, 24, 2, leaf4);
+      p(ctx, -12 + sway, -18, 20, 2, 'rgba(0,0,10,0.18)');
+      p(ctx, -8 + sway, -41, 4, 2, 'rgba(255,255,255,0.14)');
+      p(ctx, 2 + sway2, -45, 3, 2, 'rgba(255,255,255,0.2)');
       break;
     }
     case 'pine': case 'pine_snow': {
       const snow = type === 'pine_snow';
       const leaf = snow ? '#2f5946' : (biome.pine || '#356044');
+      const leaf2 = shade(leaf, 0.16);
+      const leaf3 = shade(leaf, -0.16);
+      const sway = Math.sin(time * 1.1 + v) * 0.6;
       p(ctx, -2, -12, 4, 12, '#4a3324');
-      p(ctx, -9, -22, 18, 11, leaf);
-      p(ctx, -7, -31, 14, 11, leaf);
-      p(ctx, -5, -39, 10, 10, leaf);
-      p(ctx, -2, -44, 4, 7, leaf);
+      p(ctx, -2, -12, 1, 12, '#5d4430');
+      p(ctx, -5, -2, 3, 2, '#4a3324');           // root
+      p(ctx, 3, -2, 3, 2, '#4a3324');
+      p(ctx, -9 + sway, -22, 18, 11, leaf3);
+      p(ctx, -9 + sway, -22, 18, 3, leaf);
+      p(ctx, -7 + sway, -31, 14, 11, leaf);
+      p(ctx, -7 + sway, -31, 14, 2, leaf2);
+      p(ctx, -5 + sway, -39, 10, 10, leaf);
+      p(ctx, -2 + sway, -44, 4, 7, leaf);
       if (snow) {
-        p(ctx, -9, -22, 18, 2, '#eef6fa');
-        p(ctx, -7, -31, 14, 2, '#eef6fa');
-        p(ctx, -5, -39, 10, 2, '#eef6fa');
-        p(ctx, -2, -44, 4, 2, '#fff');
-        p(ctx, -11, -18, 4, 2, '#d7e6ef');
+        p(ctx, -9 + sway, -22, 18, 2, '#eef6fa');
+        p(ctx, -7 + sway, -31, 14, 2, '#eef6fa');
+        p(ctx, -5 + sway, -39, 10, 2, '#eef6fa');
+        p(ctx, -2 + sway, -44, 4, 2, '#fff');
+        p(ctx, -11 + sway, -18, 4, 2, '#d7e6ef');
+        p(ctx, 5 + sway, -16, 3, 2, '#d7e6ef');
       } else {
-        p(ctx, -4, -28, 9, 2, shade(leaf, 0.16));
+        p(ctx, -4 + sway, -28, 9, 2, shade(leaf, 0.24));
+        p(ctx, 2 + sway, -20, 6, 2, shade(leaf, 0.1));
       }
       break;
     }
     case 'dead_tree': {
       p(ctx, -2, -26, 5, 26, '#4a3a34');
+      p(ctx, -2, -26, 2, 26, '#5d4a44');
       p(ctx, -10, -30, 9, 3, '#4a3a34');
       p(ctx, -12, -36, 3, 7, '#4a3a34');
       p(ctx, 5, -26, 8, 3, '#4a3a34');
       p(ctx, 10, -33, 3, 8, '#4a3a34');
-      p(ctx, -6, -20, 6, 2, '#3a2c2a');
+      p(ctx, 10, -39, 4, 6, '#4a3a34');
+      p(ctx, -6, -20, 7, 2, '#3a2c2a');
+      p(ctx, -1, -30, 6, 2, '#3a2c2a');
+      if (v % 3 === 0) {
+        p(ctx, -6, -18, 3, 2, '#4e4048');       // woodpecker hole
+        p(ctx, -5, -17, 1, 1, '#241c20');
+      }
       break;
     }
     case 'bush': {
       const c = biome.bush || '#3f7a44';
-      p(ctx, -7, -6, 14, 6, shade(c, -0.18));
+      const d = shade(c, -0.18), l = shade(c, 0.2);
+      p(ctx, -7, -6, 14, 6, d);
       p(ctx, -6, -9, 12, 5, c);
-      p(ctx, -4, -11, 5, 3, shade(c, 0.15));
-      p(ctx, 3, -8, 3, 3, shade(c, 0.1));
+      p(ctx, -4, -11, 5, 3, l);
+      p(ctx, 3, -8, 3, 3, l);
+      p(ctx, -6, -4, 4, 2, shade(c, -0.26));
+      p(ctx, 6, -7, 2, 2, shade(c, -0.26));
+      if (v % 3 === 0) {
+        px(ctx, -3, -10, '#ff5a6b');
+        px(ctx, 1, -9, '#ff5a6b');
+        px(ctx, -2, -8, '#ffd166');
+      } else if (v % 3 === 1) {
+        px(ctx, 0, -11, '#e8f0ff');
+        px(ctx, -4, -9, '#e8f0ff');
+      }
       break;
     }
     case 'flowers': {
-      const cols = ['#ffd166', '#ff8fa3', '#a99bff', '#8fe2ff'];
-      for (let i = 0; i < 5; i++) {
-        const fx = -5 + (i * 3) % 10;
-        const fy = -4 + ((i * 5) % 4);
-        p(ctx, fx, fy, 1, 4, '#4f7a43');
+      const cols = ['#ffd166', '#ff8fa3', '#a99bff', '#8fe2ff', '#f7f4ea'];
+      for (let i = 0; i < 7; i++) {
+        const fx = -6 + (i * 4) % 13;
+        const fy = -4 + ((i * 5) % 5);
+        p(ctx, fx, fy, 1, 4, i % 2 ? '#4f7a43' : '#5d8a4d');
         px(ctx, fx, fy - 1, cols[(v + i) % cols.length]);
+        if (i % 3 === 0) px(ctx, fx - 1, fy - 1, cols[(v + i + 2) % cols.length]);
       }
       break;
     }
@@ -1013,14 +1061,31 @@ export function drawProp(ctx, prop, time, biome = {}) {
       p(ctx, -7, -8, 14, 8, '#6f737a');
       p(ctx, -5, -11, 10, 5, '#858a91');
       p(ctx, -3, -12, 5, 2, '#9aa0a6');
-      if (snow) p(ctx, -5, -11, 10, 2, '#eef6fa');
+      p(ctx, -6, -5, 3, 3, '#5d6068');           // facet shadow
+      p(ctx, 3, -4, 3, 3, '#5d6068');
+      p(ctx, 1, -10, 3, 2, '#a6adb4');           // sun facet
+      if (v % 4 === 0) px(ctx, -2, -6, '#6b8a4f');   // moss
+      if (snow) {
+        p(ctx, -5, -11, 10, 2, '#eef6fa');
+        p(ctx, -3, -9, 5, 1, '#d7e6ef');
+      }
       break;
     }
     case 'boulder': {
       p(ctx, -10, -14, 20, 14, '#676b73');
       p(ctx, -8, -19, 16, 7, '#7f858d');
       p(ctx, -4, -21, 8, 4, '#969ca3');
+      p(ctx, 2, -18, 6, 3, '#a8aeb5');
       p(ctx, -6, -14, 4, 3, '#565a61');
+      p(ctx, 4, -10, 5, 4, '#565a61');
+      ctx.strokeStyle = 'rgba(30,30,38,0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(-2, -19); ctx.lineTo(1, -12); ctx.lineTo(-2, -6); ctx.stroke();
+      if (v % 3 === 0) {
+        px(ctx, -7, -13, '#6b8a4f');
+        px(ctx, -6, -14, '#7fa25e');
+        px(ctx, 6, -16, '#6b8a4f');
+      }
       break;
     }
     case 'ore': {
@@ -1042,12 +1107,20 @@ export function drawProp(ctx, prop, time, biome = {}) {
     }
     case 'mushroom': {
       const glow = biome.mushroom || '#9b6bff';
+      const pulse = Math.sin(time * 2 + v * 0.5) * 0.5 + 0.5;
+      ctx.globalAlpha = 0.14 + pulse * 0.12;
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(0, -10, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
       p(ctx, -2, -8, 4, 8, '#d8c8a8');
+      p(ctx, -2, -8, 1, 8, '#e6d8bc');
       p(ctx, -8, -12, 16, 6, glow);
       p(ctx, -6, -15, 12, 4, shade(glow, 0.18));
       p(ctx, -4, -16, 8, 2, shade(glow, 0.3));
       p(ctx, -3, -11, 2, 1, '#fff');
       p(ctx, 4, -10, 2, 1, '#fff');
+      px(ctx, -6, -13, shade(glow, 0.45));
+      px(ctx, 5, -14, shade(glow, 0.45));
       break;
     }
     case 'web': {
@@ -1063,10 +1136,15 @@ export function drawProp(ctx, prop, time, biome = {}) {
     }
     case 'grave': {
       p(ctx, -5, -14, 10, 14, '#5a5d68');
+      p(ctx, -5, -14, 3, 14, '#6f737a');
       p(ctx, -4, -17, 8, 4, '#6f737a');
       p(ctx, -4, -12, 8, 1, '#464952');
       p(ctx, -1, -15, 2, 4, '#9aa0a6');
+      ctx.strokeStyle = 'rgba(40,42,50,0.6)';
+      ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(1, -12); ctx.lineTo(3, -7); ctx.lineTo(2, -3); ctx.stroke();
       p(ctx, -4, -4, 8, 1, '#3f7a44');
+      if (v % 3 === 0) px(ctx, 2, -16, '#6b8a4f');
       break;
     }
     case 'bone': {
@@ -1099,10 +1177,18 @@ export function drawProp(ctx, prop, time, biome = {}) {
     }
     case 'crystal': {
       const c = biome.crystal || '#85d6f0';
+      const pulse = Math.sin(time * 2 + v) * 0.5 + 0.5;
+      ctx.globalAlpha = 0.16 + pulse * 0.12;
+      ctx.fillStyle = c;
+      ctx.beginPath(); ctx.arc(0, -12, 12 + pulse * 3, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
       p(ctx, -5, -20, 10, 20, shade(c, -0.2));
       p(ctx, -3, -24, 6, 5, c);
       p(ctx, -2, -22, 2, 14, shade(c, 0.35));
+      p(ctx, 1, -24, 1, 12, shade(c, 0.5));
       p(ctx, 5, -12, 4, 12, shade(c, -0.05));
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillRect(-3 - pulse * 1.5, -26, 1, 2 + pulse * 2);
       break;
     }
     case 'snowman': {
@@ -1184,9 +1270,20 @@ export function drawProp(ctx, prop, time, biome = {}) {
       break;
     }
     case 'brazier': {
+      // rising sparks
+      for (let i = 0; i < 2; i++) {
+        const sp = ((time * 2.4 + i * 0.9 + v * 0.2) % 1.4) / 1.4;
+        ctx.globalAlpha = (1 - sp) * 0.7;
+        ctx.fillStyle = '#ffb23e';
+        ctx.fillRect(Math.sin(time * 6 + i) * 2 - 1, -14 - sp * 12, 1, 2);
+      }
+      ctx.globalAlpha = 1;
       p(ctx, -4, -7, 8, 7, '#4a3a34');
+      p(ctx, -4, -7, 8, 2, '#6f5a4a');
+      px(ctx, -2, -5, '#2b1f1b');
       p(ctx, -2, -12, 4, 5, '#ff7a3c');
       p(ctx, -1, -16 - flick * 2, 2, 5, '#ffd166');
+      p(ctx, -1, -14 - flick * 2, 1, 3, '#fff2c8');
       p(ctx, -5, -8, 10, 2, '#6f737a');
       break;
     }
@@ -1230,33 +1327,60 @@ export function drawProp(ctx, prop, time, biome = {}) {
       const wallD = shade(wall, -0.15);
       const roof = biome.roof || '#7a3f35';
       const roofL = shade(roof, 0.15);
+      const roofD = shade(roof, -0.22);
+      // stone foundation
+      p(ctx, -18, -6, 36, 6, '#6f6a64');
+      p(ctx, -18, -6, 36, 1, '#847e77');
+      for (let i = 0; i < 6; i++) px(ctx, -17 + i * 6, -4 + (i % 2), '#5d5852');
       // base
-      p(ctx, -18, -20, 36, 20, wallD);
-      p(ctx, -17, -21, 34, 18, wall);
-      // timber
+      p(ctx, -18, -20, 36, 15, wallD);
+      p(ctx, -17, -21, 34, 14, wall);
+      p(ctx, -17, -21, 34, 2, shade(wall, 0.1));
+      // timber frame
       p(ctx, -17, -14, 34, 2, '#5a3f27');
-      p(ctx, -11, -21, 2, 20, '#5a3f27');
-      p(ctx, 9, -21, 2, 20, '#5a3f27');
-      // roof
+      p(ctx, -11, -21, 2, 15, '#5a3f27');
+      p(ctx, 9, -21, 2, 15, '#5a3f27');
+      p(ctx, -4, -21, 2, 8, '#5f4429');
+      p(ctx, 2, -21, 2, 8, '#5f4429');
+      // roof with shingle rows
       p(ctx, -21, -28, 42, 8, roof);
       p(ctx, -17, -34, 34, 7, roofL);
       p(ctx, -12, -38, 24, 5, shade(roof, 0.25));
-      p(ctx, -21, -28, 42, 2, shade(roof, -0.2));
-      // door
+      p(ctx, -21, -28, 42, 2, roofD);
+      for (let i = 0; i < 7; i++) p(ctx, -20 + i * 6, -27, 1, 5, roofD);
+      for (let i = 0; i < 6; i++) p(ctx, -16 + i * 6, -33, 1, 4, shade(roof, -0.1));
+      p(ctx, -12, -38, 24, 1, shade(roof, 0.4));
+      // door with step
       p(ctx, -5, -14, 10, 14, '#4a3324');
       p(ctx, -3, -11, 6, 8, '#5f422d');
       px(ctx, 2, -8, 1, 1, '#d5a44c');
-      // windows
-      p(ctx, -14, -19, 5, 5, '#2b3340');
-      p(ctx, -13, -18, 3, 3, '#ffcf5c');
-      p(ctx, 8, -19, 5, 5, '#2b3340');
-      p(ctx, 9, -18, 3, 3, '#ffcf5c');
-      // chimney
+      p(ctx, -6, -1, 12, 1, '#7d736a');
+      // windows (glow flickers)
+      const winGlow = 0.75 + flick * 0.25;
+      ctx.globalAlpha = winGlow;
+      p(ctx, -14, -19, 5, 5, '#ffcf5c');
+      p(ctx, 8, -19, 5, 5, '#ffcf5c');
+      ctx.globalAlpha = 1;
+      p(ctx, -14, -19, 5, 2, 'rgba(255,255,255,0.25)');
+      p(ctx, 8, -19, 5, 2, 'rgba(255,255,255,0.25)');
+      p(ctx, -14, -19, 5, 5, 'rgba(20,20,30,0.15)');
+      // chimney with drifting smoke
       p(ctx, 10, -42, 4, 8, wallD);
       p(ctx, 9, -43, 6, 2, shade(wallD, -0.1));
+      const smokeT = time * 0.9 + v;
+      for (let i = 0; i < 3; i++) {
+        const sp = ((smokeT + i * 0.8) % 2.4) / 2.4;
+        ctx.globalAlpha = (1 - sp) * 0.28;
+        const sy = -44 - sp * 14;
+        const sx = 12 + Math.sin((smokeT + i) * 2) * 3;
+        ctx.fillStyle = '#cfd4de';
+        ctx.fillRect(sx, sy, 2 + sp * 2, 2 + sp * 2);
+      }
+      ctx.globalAlpha = 1;
       // flower box
       p(ctx, -14, -13, 6, 2, '#4f8a4b');
       px(ctx, -12, -14, '#ffd166');
+      px(ctx, -10, -14, '#ff8fa3');
       break;
     }
     case 'tent': {
@@ -1270,11 +1394,21 @@ export function drawProp(ctx, prop, time, biome = {}) {
       break;
     }
     case 'campfire': {
+      // sparks rising before the flame
+      for (let i = 0; i < 3; i++) {
+        const sp = ((time * 2 + i * 0.7 + v * 0.1) % 1.5) / 1.5;
+        ctx.globalAlpha = (1 - sp) * 0.8;
+        ctx.fillStyle = i % 2 ? '#ffd166' : '#ff9a4a';
+        ctx.fillRect(Math.sin(time * 5 + i * 2) * 3 - 1, -12 - sp * 16, 1, 2);
+      }
+      ctx.globalAlpha = 1;
       p(ctx, -6, -3, 12, 3, '#4a3324');
       p(ctx, -4, -5, 8, 3, '#5e402c');
+      p(ctx, 3, -2, 3, 2, '#3a2a1c');
       p(ctx, -3, -10 - flick * 2, 6, 6, '#ff7a3c');
       p(ctx, -2, -14 - flick * 3, 4, 6, '#ffd166');
       p(ctx, -1, -18 - flick * 2, 2, 5, '#ff5a3c');
+      p(ctx, -2, -13 - flick * 3, 2, 4, '#fff2c8');
       // light ring
       ctx.globalAlpha = 0.10 + flick * 0.06;
       ctx.fillStyle = '#ffb23e';
@@ -1293,18 +1427,27 @@ export function drawProp(ctx, prop, time, biome = {}) {
       break;
     }
     case 'stall': {
+      // counter with plank seams
       p(ctx, -16, -12, 32, 12, '#6b4a30');
       p(ctx, -16, -13, 32, 3, '#8a6038');
+      for (let i = 0; i < 5; i++) p(ctx, -10 + i * 6, -12, 1, 10, '#5d3f28');
+      // striped awning
       for (const [i, col] of ['#a83232', '#e8c46a', '#a83232', '#e8c46a'].entries()) {
         p(ctx, -16 + i * 8, -24, 8, 7, col);
       }
+      p(ctx, -16, -24, 32, 1, 'rgba(255,255,255,0.25)');
+      p(ctx, -16, -18, 32, 1, '#3f2c20');
       p(ctx, -16, -24, 32, 1, '#4a3324');
       p(ctx, -17, -24, 1, 12, '#4a3324');
       p(ctx, 16, -24, 1, 12, '#4a3324');
-      // wares
+      // wares on the counter
       p(ctx, -10, -16, 4, 3, '#d5a44c');
       p(ctx, -2, -17, 5, 4, '#5aa9ff');
       p(ctx, 7, -16, 4, 3, '#65d67a');
+      p(ctx, -10, -16, 4, 1, '#f2d98c');
+      // hanging herbs
+      p(ctx, 2, -21, 2, 4, '#4f8a4b');
+      p(ctx, -8, -21, 2, 4, '#6d7a3a');
       break;
     }
     case 'crate': {
@@ -1317,11 +1460,21 @@ export function drawProp(ctx, prop, time, biome = {}) {
     case 'well': {
       p(ctx, -9, -8, 18, 8, '#6f737a');
       p(ctx, -8, -10, 16, 3, '#858a91');
+      px(ctx, -6, -7, '#5d6068'); px(ctx, 3, -6, '#5d6068');
       p(ctx, -6, -9, 12, 3, '#2b6d78');
+      ctx.fillStyle = 'rgba(215,246,255,0.5)';
+      ctx.fillRect(-3 + Math.sin(time * 1.5) * 2, -8, 4, 1);
       p(ctx, -7, -26, 2, 18, '#5a3f27');
       p(ctx, 5, -26, 2, 18, '#5a3f27');
+      p(ctx, -7, -26, 2, 2, '#6d4d30'); // beam caps
+      p(ctx, 5, -26, 2, 2, '#6d4d30');
       p(ctx, -9, -29, 18, 3, '#7a4a3c');
+      p(ctx, -9, -29, 18, 1, '#96603e');
       p(ctx, -5, -24, 10, 2, '#8a6038');
+      // rope + bucket
+      p(ctx, 0, -24, 1, 12, '#c9b48a');
+      p(ctx, -2, -12, 4, 3, '#6d5238');
+      p(ctx, -1, -14, 2, 1, '#8a6a44');
       break;
     }
     case 'altar': {

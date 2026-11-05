@@ -24,7 +24,10 @@ export class Renderer {
     this.width = 0;
     this.height = 0;
     this.time = 0;
+    this.viewZoom = 1;
+    this.setZoom();
     this.particles = [];
+    this.dust = [];
     this.waterTiles = [];
     this.minimapCanvas = null;
     this.lastMinimap = 0;
@@ -33,6 +36,15 @@ export class Renderer {
   }
 
   setMinimap(canvas) { this.minimapCanvas = canvas; }
+
+  setZoom() {
+    const short = Math.min(this.width || window.innerWidth, this.height || window.innerHeight);
+    // zoomed slightly further out: mobile keeps a comfortable 0.9, desktop shows more world at 0.8
+    this.viewZoom = short < 620 ? 0.9 : 0.8;
+  }
+
+  viewW() { return this.width / this.viewZoom; }
+  viewH() { return this.height / this.viewZoom; }
 
   resize() {
     const rect = this.canvas.getBoundingClientRect();
@@ -43,6 +55,7 @@ export class Renderer {
     this.canvas.height = Math.floor(this.height * this.dpr);
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = false;
+    this.setZoom();
     if (this.world) this.snapCamera(true);
   }
 
@@ -69,14 +82,21 @@ export class Renderer {
     };
   }
 
-  worldToScreen(x, y) {
+  worldToView(x, y) {
     const p = this.iso(x, y);
     return { x: p.x - this.cam.x, y: p.y - this.cam.y };
   }
 
+  // For input mapping: returns CSS pixel coordinates (zoom-adjusted)
+  worldToScreen(x, y) {
+    const p = this.iso(x, y);
+    return { x: (p.x - this.cam.x) * this.viewZoom, y: (p.y - this.cam.y) * this.viewZoom };
+  }
+
   screenToWorld(sx, sy) {
-    const ix = sx + this.cam.x - this.offsetX;
-    const iy = sy + this.cam.y - this.offsetY;
+    const z = this.viewZoom;
+    const ix = sx / z + this.cam.x - this.offsetX;
+    const iy = sy / z + this.cam.y - this.offsetY;
     const a = ix / (TW / 2);
     const b = iy / (TH / 2);
     return { x: (a + b) / 2, y: (b - a) / 2 };
@@ -86,8 +106,8 @@ export class Renderer {
     const g = this.game;
     if (!g || !g.player) return;
     const p = this.iso(g.player.x, g.player.y);
-    this.camTarget.x = p.x - this.width / 2;
-    this.camTarget.y = p.y - this.height / 2 - 30;
+    this.camTarget.x = p.x - this.viewW() / 2;
+    this.camTarget.y = p.y - this.viewH() / 2 - 30;
     this.clampCamera(this.camTarget);
     if (instant || !this.snapped) {
       this.cam.x = this.camTarget.x;
@@ -97,11 +117,12 @@ export class Renderer {
   }
 
   clampCamera(c) {
-    const maxX = Math.max(0, this.groundW - this.width);
-    const maxY = Math.max(0, this.groundH - this.height);
-    if (this.groundW < this.width) c.x = (this.groundW - this.width) / 2;
+    const vw = this.viewW(), vh = this.viewH();
+    const maxX = Math.max(0, this.groundW - vw);
+    const maxY = Math.max(0, this.groundH - vh);
+    if (this.groundW < vw) c.x = (this.groundW - vw) / 2;
     else c.x = clamp(c.x, 0, maxX);
-    if (this.groundH < this.height) c.y = (this.groundH - this.height) / 2;
+    if (this.groundH < vh) c.y = (this.groundH - vh) / 2;
     else c.y = clamp(c.y, 0, maxY);
   }
 
@@ -127,7 +148,7 @@ export class Renderer {
         const t = world.tiles[y * world.size + x];
         const cx = this.offsetX + (x - y) * TW / 2;
         const cy = this.offsetY + (x + y) * TH / 2;
-        this.drawTile(ctx, t, cx, cy, pal, x, y);
+        this.drawTile(ctx, t, cx, cy, pal, x, y, world);
       }
     }
 
@@ -142,7 +163,7 @@ export class Renderer {
     return c;
   }
 
-  drawTile(ctx, t, cx, cy, pal, tx, ty) {
+  drawTile(ctx, t, cx, cy, pal, tx, ty, world) {
     const type = t.type;
     let base;
     switch (type) {
@@ -156,39 +177,85 @@ export class Renderer {
       case 'ground3': base = pal.ground3; break;
       default: base = pal.ground1;
     }
-    // per tile variation
-    const v = (t.variant % 9) - 4;
-    base = shade(base, v * 0.006);
     const w = TW / 2, h = TH / 2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - h);
-    ctx.lineTo(cx + w, cy);
-    ctx.lineTo(cx, cy + h);
-    ctx.lineTo(cx - w, cy);
-    ctx.closePath();
-    ctx.fillStyle = base;
-    ctx.fill();
+    const size = world ? world.size : 0;
+    const nbType = (dx, dy) => {
+      if (!world) return null;
+      const nx = tx + dx, ny = ty + dy;
+      if (nx < 0 || ny < 0 || nx >= size || ny >= size) return null;
+      return world.tiles[ny * size + nx]?.type || null;
+    };
+    const waterAlong = world ? ['water'].some(k => [nbType(1, 0), nbType(-1, 0), nbType(0, 1), nbType(0, -1), nbType(1, 1), nbType(1, -1), nbType(-1, 1), nbType(-1, -1)].includes(k)) : false;
 
     if (type === 'water') {
-      ctx.fillStyle = shade(pal.water, -0.12);
-      ctx.fillRect(cx - 8, cy - 1, 16, 1);
-      ctx.fillRect(cx - 3, cy + 4, 9, 1);
-      ctx.fillStyle = 'rgba(255,255,255,0.16)';
-      ctx.fillRect(cx - 12, cy - 4, 7, 1);
-      ctx.fillRect(cx + 4, cy + 2, 5, 1);
+      const deep = ['water'].includes(nbType(1, 0)) && ['water'].includes(nbType(-1, 0)) && ['water'].includes(nbType(0, 1)) && ['water'].includes(nbType(0, -1))
+        && ['water'].includes(nbType(1, 1)) && ['water'].includes(nbType(-1, -1)) && ['water'].includes(nbType(1, -1)) && ['water'].includes(nbType(-1, 1));
+      base = deep ? shade(pal.water, -0.16) : shade(pal.water, 0.02);
+      const v = (t.variant % 9) - 4;
+      base = shade(base, v * 0.005);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - h); ctx.lineTo(cx + w, cy); ctx.lineTo(cx, cy + h); ctx.lineTo(cx - w, cy);
+      ctx.closePath();
+      ctx.fillStyle = base;
+      ctx.fill();
+      // depth shading toward the centre of lakes
+      if (deep) {
+        ctx.fillStyle = 'rgba(4,12,26,0.18)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, w * 0.42, h * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.fillRect(cx - 12, cy - 2, 9, 1);
+        ctx.fillRect(cx + 3, cy + 3, 6, 1);
+      } else {
+        // shallow sandy bottom showing through + foam flecks
+        ctx.fillStyle = shade(pal.water, 0.14);
+        ctx.fillRect(cx - 8, cy - 1, 14, 1);
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.fillRect(cx - 11, cy - 4, 6, 1);
+        ctx.fillRect(cx + 5, cy + 1, 4, 1);
+        ctx.fillRect(cx - 2, cy - 7, 3, 1);
+      }
       return;
     }
     if (type === 'void') {
-      if ((t.variant + tx + ty) % 7 === 0) {
-        ctx.fillStyle = 'rgba(180,160,255,0.5)';
-        ctx.fillRect(cx - 1, cy - 1, 1, 1);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - h); ctx.lineTo(cx + w, cy); ctx.lineTo(cx, cy + h); ctx.lineTo(cx - w, cy);
+      ctx.closePath();
+      ctx.fillStyle = '#05040c';
+      ctx.fill();
+      const rngV = (t.variant * 9301 + 49297) % 233280;
+      for (let i = 0; i < 4; i++) {
+        const rx = ((rngV * (i + 5) + 311) % 100) / 100;
+        const ry = ((rngV * (i + 11) + 733) % 100) / 100;
+        const dx = (rx - 0.5) * w * 0.9, dy = (ry - 0.5) * h * 0.9;
+        if (Math.abs(dx) / w + Math.abs(dy) / h > 0.8) continue;
+        ctx.fillStyle = i === 0 ? 'rgba(180,160,255,0.55)' : 'rgba(140,120,220,0.28)';
+        ctx.fillRect(cx + dx, cy + dy, 1, 1);
+      }
+      if ((t.variant + tx + ty) % 23 === 0) {
+        ctx.fillStyle = 'rgba(169,155,255,0.16)';
+        ctx.beginPath(); ctx.ellipse(cx, cy, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
       }
       return;
     }
 
+    // land diamond + soft water-edge halo
+    const v = (t.variant % 9) - 4;
+    base = shade(base, v * 0.006);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - h); ctx.lineTo(cx + w, cy); ctx.lineTo(cx, cy + h); ctx.lineTo(cx - w, cy);
+    ctx.closePath();
+    ctx.fillStyle = base;
+    ctx.fill();
+    if (waterAlong && type === 'shore') {
+      ctx.fillStyle = 'rgba(240,236,210,0.28)';
+      ctx.fillRect(cx - 4, cy - 2, 8, 1);
+    }
+
     // texture specks inside the diamond
     const rngV = (t.variant * 9301 + 49297) % 233280;
-    const dots = 3 + (t.variant % 4);
+    const dots = 4 + (t.variant % 5);
     for (let i = 0; i < dots; i++) {
       const rx = ((rngV * (i + 3) + 137) % 100) / 100;
       const ry = ((rngV * (i + 7) + 911) % 100) / 100;
@@ -199,6 +266,81 @@ export class Renderer {
       ctx.fillStyle = light ? shade(base, 0.09) : shade(base, -0.08);
       ctx.fillRect(cx + dx, cy + dy, 2, 1);
     }
+
+    const regionId = world ? world.regionId : '';
+    const grassy = type === 'ground1' || type === 'ground2' || type === 'ground3' || type === 'shore';
+
+    if (grassy && type !== 'path' && type !== 'plaza' && type !== 'plaza_light') {
+      // grass tufts: paired light/dark blades
+      const tufts = type === 'ground1' ? 2 : 1;
+      for (let i = 0; i < tufts; i++) {
+        const rx = ((rngV * (i + 17) + 551) % 100) / 100;
+        const ry = ((rngV * (i + 29) + 197) % 100) / 100;
+        const dx = (rx - 0.5) * w * 0.9;
+        const dy = (ry - 0.5) * h * 0.7;
+        if (Math.abs(dx) / w + Math.abs(dy) / h > 0.7) continue;
+        ctx.fillStyle = shade(base, 0.17);
+        ctx.fillRect(cx + dx, cy + dy - 2, 1, 3);
+        ctx.fillRect(cx + dx + 2, cy + dy - 1, 1, 2);
+        ctx.fillStyle = shade(base, -0.13);
+        ctx.fillRect(cx + dx - 2, cy + dy, 1, 2);
+      }
+      // wildflower accents (region palette driven)
+      if (type === 'ground1' && t.variant % 13 === 0) {
+        const flowerColors = {
+          greendale: ['#ffd166', '#ff8fa3'], ironcrag: ['#ffb23e'], venomwood: ['#b06bff', '#9b6bff'],
+          mistgrave: ['#c9d8e8'], frostpeak: ['#bfefff'], sunscorch: ['#ffd166', '#ff9a4a'],
+          ashen: ['#ff7a3c'], tower: ['#a99bff']
+        };
+        const cols = flowerColors[regionId] || ['#ffd166'];
+        const rx = ((rngV * 41 + 97) % 100) / 100;
+        const ry = ((rngV * 53 + 41) % 100) / 100;
+        const dx = (rx - 0.5) * w * 0.7, dy = (ry - 0.5) * h * 0.55;
+        if (Math.abs(dx) / w + Math.abs(dy) / h < 0.62) {
+          ctx.fillStyle = '#3f6a38';
+          ctx.fillRect(cx + dx, cy + dy, 1, 2);
+          ctx.fillStyle = cols[(t.variant + tx) % cols.length];
+          ctx.fillRect(cx + dx - 1, cy + dy - 1, 2, 2);
+        }
+      }
+    }
+
+    // region ground accents
+    if (regionId === 'frostpeak' && grassy && t.variant % 5 === 0) {
+      ctx.fillStyle = 'rgba(238,246,250,0.5)';
+      ctx.fillRect(cx - 6 + (t.variant % 7), cy - 2, 6, 1);
+      ctx.fillRect(cx + 2 + (v % 3), cy + 2, 4, 1);
+    } else if (regionId === 'sunscorch' && grassy && t.variant % 4 === 0) {
+      ctx.fillStyle = shade(base, 0.12);
+      ctx.fillRect(cx - 7, cy + 1, 10, 1);
+      ctx.fillRect(cx - 3, cy - 3, 8, 1);
+    } else if (regionId === 'ashen' && grassy && t.variant % 6 === 0) {
+      ctx.fillStyle = 'rgba(20,12,12,0.3)';
+      ctx.fillRect(cx - 8, cy, 5, 1);
+      ctx.fillRect(cx - 2, cy + 2, 7, 1);
+      if (t.variant % 12 === 0) {
+        ctx.fillStyle = '#ff7a3c';
+        ctx.fillRect(cx + 6, cy - 1, 1, 1);
+      }
+    } else if (regionId === 'tower' && grassy && t.variant % 7 === 0) {
+      ctx.fillStyle = 'rgba(169,155,255,0.22)';
+      ctx.fillRect(cx - 1, cy + 5, 4, 1);
+      ctx.fillRect(cx + 3, cy + 3, 2, 1);
+    } else if (regionId === 'mistgrave' && grassy && t.variant % 6 === 0) {
+      ctx.fillStyle = 'rgba(190,205,220,0.12)';
+      ctx.beginPath(); ctx.ellipse(cx + (v % 5), cy - 3, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
+    } else if (regionId === 'venomwood' && type === 'ground1' && t.variant % 8 === 0) {
+      ctx.fillStyle = 'rgba(24,34,18,0.35)';
+      ctx.fillRect(cx - 6, cy + 1, 9, 1);
+      ctx.fillStyle = '#8f4fb0';
+      ctx.fillRect(cx + 4, cy - 2, 1, 1);
+    } else if (regionId === 'ironcrag' && grassy && t.variant % 9 === 0) {
+      ctx.fillStyle = '#7d7872';
+      ctx.fillRect(cx - 3, cy + 3, 3, 2);
+      ctx.fillStyle = '#96908a';
+      ctx.fillRect(cx - 2, cy + 3, 1, 1);
+    }
+
     if (type !== 'path' && type !== 'plaza' && type !== 'plaza_light' && t.variant % 11 === 0) {
       ctx.fillStyle = shade(base, 0.14);
       ctx.fillRect(cx - 2, cy - 3, 1, 3);
@@ -213,6 +355,29 @@ export class Renderer {
         ctx.fillStyle = shade(base, -0.07);
         ctx.fillRect(cx - 2, cy + 3, 6, 1);
       }
+      // set cobblestone stones on some tiles
+      if (t.variant % 3 === 0) {
+        const stones = 1 + (t.variant % 2);
+        for (let i = 0; i < stones; i++) {
+          const sx = 12 + ((t.variant * 7 + i * 31) % 13);
+          const sy = 4 + ((t.variant * 13 + i * 17) % 9);
+          ctx.fillStyle = shade(base, 0.13);
+          ctx.fillRect(cx - sx / 2, cy - 2 + sy * 0.6, sx, 2);
+          ctx.fillStyle = shade(base, -0.1);
+          ctx.fillRect(cx - sx / 2, cy + sy * 0.6, sx, 1);
+        }
+      }
+      // path-side pebbles / weeds
+      if (t.variant % 7 === 0) {
+        ctx.fillStyle = shade(base, 0.05);
+        ctx.fillRect(cx + w * 0.55, cy - 1, 2, 1);
+        ctx.fillStyle = shade(base, -0.12);
+        ctx.fillRect(cx - w * 0.6, cy + 1, 2, 1);
+      }
+    }
+    if (type === 'plaza_light') {
+      ctx.fillStyle = shade(base, 0.1);
+      ctx.fillRect(cx - 14, cy - 2, 28, 1);
     }
   }
 
@@ -327,19 +492,23 @@ export class Renderer {
     const ctx = this.ctx;
     this.time += dt;
     this.updateWeather(dt);
+    this.updateDust(dt);
     const world = this.world;
     if (!world || !game.player) return;
+    const z = this.viewZoom;
+    const vw = this.viewW(), vh = this.viewH();
 
-    // camera follow
+    // camera follow (still smoothly centered on the player)
     const p = this.iso(game.player.x, game.player.y);
-    this.camTarget.x = lerp(this.camTarget.x, p.x - this.width / 2, 0.18);
-    this.camTarget.y = lerp(this.camTarget.y, p.y - this.height / 2 - 34, 0.18);
+    this.camTarget.x = lerp(this.camTarget.x, p.x - vw / 2, 0.18);
+    this.camTarget.y = lerp(this.camTarget.y, p.y - vh / 2 - 34, 0.18);
     this.clampCamera(this.camTarget);
     this.cam.x = lerp(this.cam.x, this.camTarget.x, 0.22);
     this.cam.y = lerp(this.cam.y, this.camTarget.y, 0.22);
     if (Math.abs(this.cam.x - this.camTarget.x) < 0.05) this.cam.x = this.camTarget.x;
     if (Math.abs(this.cam.y - this.camTarget.y) < 0.05) this.cam.y = this.camTarget.y;
 
+    // ---- sky backdrop (screen space) ----
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
     const pal = world.region.palette;
@@ -349,50 +518,59 @@ export class Renderer {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, this.width, this.height);
 
-    // ground
+    // ---- world (zoomed slightly out to show more of the surrounding land) ----
+    ctx.setTransform(this.dpr * z, 0, 0, this.dpr * z, 0, 0);
+    // ground is the only pre-rendered bitmap — smooth its downscale so the pixel art stays clean
+    ctx.imageSmoothingEnabled = true;
+    if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(this.ground, -Math.round(this.cam.x), -Math.round(this.cam.y));
+    ctx.imageSmoothingEnabled = false;
 
     this.drawWaterFX(ctx);
 
     // lights beneath objects
     this.drawGroundLights(ctx, world);
 
+    // player running dust behind entities
+    this.spawnDust(game);
+    this.drawDust(ctx);
+
     // collect drawables
     const drawables = [];
-    const margin = 220;
-    const visible = (sx, sy) => sx > -margin && sx < this.width + margin && sy > -margin - 100 && sy < this.height + margin;
+    const margin = 260;
+    const visible = (sx, sy) => sx > -margin && sx < vw + margin && sy > -margin - 100 && sy < vh + margin;
 
     for (const prop of world.props) {
-      const s = this.worldToScreen(prop.x, prop.y);
+      const s = this.worldToView(prop.x, prop.y);
       if (visible(s.x, s.y - 80)) drawables.push({ z: prop.x + prop.y, read: () => this.drawPropSprite(ctx, prop, s) });
     }
     for (const node of world.nodes) {
       if (node.respawnAt > Date.now()) continue;
-      const s = this.worldToScreen(node.x, node.y);
+      const s = this.worldToView(node.x, node.y);
       if (visible(s.x, s.y)) drawables.push({ z: node.x + node.y, read: () => this.drawNodeSprite(ctx, node, s) });
     }
     for (const h of world.hidden) {
       if (h.opened) continue;
-      const s = this.worldToScreen(h.x, h.y);
+      const s = this.worldToView(h.x, h.y);
       if (visible(s.x, s.y)) drawables.push({ z: h.x + h.y, read: () => this.drawChestSprite(ctx, h, s) });
     }
     for (const npc of world.npcs) {
-      const s = this.worldToScreen(npc.x, npc.y);
+      const s = this.worldToView(npc.x, npc.y);
       if (visible(s.x, s.y)) drawables.push({ z: npc.x + npc.y, read: () => this.drawNpcSprite(ctx, npc, s, game) });
     }
     for (const enemy of world.enemies) {
       if (!enemy.alive) continue;
-      const s = this.worldToScreen(enemy.x, enemy.y);
+      const s = this.worldToView(enemy.x, enemy.y);
       if (visible(s.x, s.y)) drawables.push({ z: enemy.x + enemy.y + 0.01, read: () => this.drawEnemySprite(ctx, enemy, s, game) });
     }
     if (game.groundLoot) {
       for (const loot of game.groundLoot) {
-        const s = this.worldToScreen(loot.x, loot.y);
+        const s = this.worldToView(loot.x, loot.y);
         if (visible(s.x, s.y)) drawables.push({ z: loot.x + loot.y + 0.005, read: () => this.drawLootSprite(ctx, loot, s) });
       }
     }
     // player
-    const ps = this.worldToScreen(game.player.x, game.player.y);
+    const ps = this.worldToView(game.player.x, game.player.y);
     drawables.push({ z: game.player.x + game.player.y + 0.02, read: () => this.drawPlayerSprite(ctx, game, ps) });
 
     drawables.sort((a, b) => a.z - b.z);
@@ -416,14 +594,20 @@ export class Renderer {
     // skill / combat effects and projectiles
     this.drawEffects(ctx, game);
 
+    // ---- screen-space atmosphere ----
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+
+    // soft light shafts over the forests
+    if (['greendale', 'venomwood', 'ironcrag'].includes(world.regionId)) this.drawSunShafts(ctx);
+
     // weather
     this.drawWeather(ctx);
 
     // ambient fog / region tint
     ctx.save();
-    const fog = ctx.createRadialGradient(this.width / 2, this.height / 2, Math.min(this.width, this.height) * 0.18, this.width / 2, this.height / 2, Math.max(this.width, this.height) * 0.78);
+    const fog = ctx.createRadialGradient(this.width / 2, this.height / 2, Math.min(this.width, this.height) * 0.2, this.width / 2, this.height / 2, Math.max(this.width, this.height) * 0.76);
     fog.addColorStop(0, pal.fog);
-    fog.addColorStop(1, 'rgba(5,4,10,0.42)');
+    fog.addColorStop(1, 'rgba(5,4,10,0.46)');
     ctx.fillStyle = fog;
     ctx.fillRect(0, 0, this.width, this.height);
     ctx.restore();
@@ -439,6 +623,72 @@ export class Renderer {
       this.lastMinimap = now;
       this.drawMinimap(this.minimapCanvas, game);
     }
+  }
+
+  // ------------------------------------------------------------
+  // RUNNING DUST
+  // ------------------------------------------------------------
+  spawnDust(game) {
+    if (!game.player.moving || !this.world) return;
+    this._dustAcc = (this._dustAcc || 0) + (this._dt || 0);
+    if (this._dustAcc < 0.14) return;
+    this._dustAcc = 0;
+    const p = this.iso(game.player.x, game.player.y);
+    this.dust.push({
+      x: p.x - this.cam.x + (Math.random() - 0.5) * 8,
+      y: p.y - this.cam.y + 2,
+      vx: (Math.random() - 0.5) * 14,
+      vy: -6 - Math.random() * 8,
+      life: 0.55 + Math.random() * 0.3,
+      maxLife: 0.85,
+      size: 2 + Math.random() * 2
+    });
+  }
+
+  updateDust(dt) {
+    this._dt = dt;
+    for (const d of this.dust) {
+      d.life -= dt;
+      d.x += d.vx * dt;
+      d.y += d.vy * dt;
+      d.vy += 20 * dt;
+    }
+    this.dust = this.dust.filter(d => d.life > 0);
+  }
+
+  drawDust(ctx) {
+    const pal = this.world.region.palette;
+    const base = shade(pal.ground1, 0.22);
+    for (const d of this.dust) {
+      const a = clamp(d.life / d.maxLife, 0, 1) * 0.3;
+      ctx.globalAlpha = a;
+      ctx.fillStyle = base;
+      const s = d.size * (1 + (1 - d.life / d.maxLife));
+      ctx.fillRect(d.x - s / 2, d.y - s / 2, s, s * 0.8);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  drawSunShafts(ctx) {
+    const t = this.time;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 3; i++) {
+      const x = this.width * (0.18 + i * 0.3) + Math.sin(t * 0.15 + i * 2) * 26;
+      const g = ctx.createLinearGradient(x, 0, x + 120, this.height);
+      g.addColorStop(0, 'rgba(255,236,170,0.075)');
+      g.addColorStop(0.75, 'rgba(255,220,140,0.02)');
+      g.addColorStop(1, 'rgba(255,220,140,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(x, -10);
+      ctx.lineTo(x + 95, -10);
+      ctx.lineTo(x + 230, this.height + 10);
+      ctx.lineTo(x + 70, this.height + 10);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   spriteScale() {
@@ -470,9 +720,10 @@ export class Renderer {
     drawProp(ctx, { ...prop, scale: 1 }, this.time, this.biomeStyle());
     ctx.restore();
 
-    // prop light sources
+    // prop light sources (flicker)
     if (['campfire', 'brazier', 'forge', 'crystal', 'void_crystal', 'star_well', 'lava_rock'].includes(prop.kind)) {
-      this.addLight(ctx, s.x, s.y - 12 * sc, prop.kind === 'forge' ? 120 : 80, prop.kind === 'crystal' || prop.kind === 'void_crystal' ? '#8fe2ff' : '#ff8a3c');
+      const fl = 0.92 + Math.sin(this.time * 6 + s.x * 0.11) * 0.07;
+      this.addLight(ctx, s.x, s.y - 12 * sc, (prop.kind === 'forge' ? 120 : 80) * fl, prop.kind === 'crystal' || prop.kind === 'void_crystal' ? '#8fe2ff' : '#ff8a3c');
     }
   }
 
@@ -659,6 +910,29 @@ export class Renderer {
     }
     this.drawShadow(ctx, s.x, s.y, mount ? 24 : 13, mount ? 0.32 : 0.26);
 
+    // arcane sigil while casting
+    if (game.player.casting) {
+      const sigC = c.classId === 'mage' ? '#79d6ff' : '#ffb23e';
+      ctx.save();
+      ctx.globalAlpha = 0.4 + Math.sin(this.time * 9) * 0.15;
+      ctx.strokeStyle = sigC;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y, 16, 7, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha *= 0.7;
+      ctx.beginPath();
+      ctx.ellipse(s.x, s.y, 9, 4, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      const spin = this.time * 6;
+      for (let i = 0; i < 6; i++) {
+        const a = spin + i * Math.PI / 3;
+        ctx.fillStyle = sigC;
+        ctx.fillRect(s.x + Math.cos(a) * 16, s.y + Math.sin(a) * 7, 1.5, 1.5);
+      }
+      ctx.restore();
+    }
+
     ctx.save();
     ctx.translate(s.x, s.y);
     ctx.scale(S, S);
@@ -734,12 +1008,14 @@ export class Renderer {
   }
 
   drawGroundLights(ctx, world) {
-    // static warm pools around campfires and forges
+    // static warm pools around campfires and forges (flickering gently)
+    const vw = this.viewW(), vh = this.viewH();
     for (const prop of world.props) {
       if (!['campfire', 'forge', 'brazier'].includes(prop.kind)) continue;
-      const s = this.worldToScreen(prop.x, prop.y);
-      if (s.x < -120 || s.x > this.width + 120 || s.y < -80 || s.y > this.height + 80) continue;
-      this.addLight(ctx, s.x, s.y - 8, prop.kind === 'forge' ? 100 : 70, '#ff9a4a', 0.16);
+      const s = this.worldToView(prop.x, prop.y);
+      if (s.x < -120 || s.x > vw + 120 || s.y < -80 || s.y > vh + 80) continue;
+      const fl = 0.9 + Math.sin(this.time * 7 + prop.x * 3) * 0.08 + Math.sin(this.time * 3.1 + prop.y) * 0.05;
+      this.addLight(ctx, s.x, s.y - 8, (prop.kind === 'forge' ? 100 : 70) * fl, '#ff9a4a', 0.16);
     }
   }
 
@@ -764,27 +1040,51 @@ export class Renderer {
     const pal = this.world.region.palette;
     const t = this.time;
     ctx.save();
-    ctx.globalAlpha = 0.4;
+    // drifting highlight waves
+    ctx.globalAlpha = 0.35;
     for (let i = 0; i < this.waterTiles.length; i++) {
       const tile = this.waterTiles[i];
       if ((i + Math.floor(t * 2)) % 4 !== 0) continue;
-      const s = this.worldToScreen(tile.x, tile.y);
-      if (s.x < -40 || s.x > this.width + 40 || s.y < -20 || s.y > this.height + 20) continue;
+      const s = this.worldToView(tile.x, tile.y);
+      if (s.x < -40 || s.x > this.viewW() + 40 || s.y < -20 || s.y > this.viewH() + 20) continue;
       const off = Math.sin(t * 1.8 + i) * 6;
       ctx.fillStyle = '#d7f6ff';
       ctx.fillRect(s.x + off - 5, s.y + 2, 10, 1);
+    }
+    // softer secondary shimmer offset from the first pass
+    ctx.globalAlpha = 0.18;
+    for (let i = 0; i < this.waterTiles.length; i++) {
+      const tile = this.waterTiles[i];
+      if ((i + Math.floor(t * 1.3) + 2) % 5 !== 0) continue;
+      const s = this.worldToView(tile.x, tile.y);
+      if (s.x < -40 || s.x > this.viewW() + 40 || s.y < -20 || s.y > this.viewH() + 20) continue;
+      const off = Math.cos(t * 1.1 + i * 1.7) * 7;
+      ctx.fillStyle = shade(pal.water, 0.3);
+      ctx.fillRect(s.x + off - 4, s.y - 2, 8, 1);
+    }
+    // occasional glint
+    ctx.globalAlpha = 0.8;
+    for (let i = 0; i < this.waterTiles.length; i++) {
+      if ((i + Math.floor(t * 0.7)) % 17 !== 0) continue;
+      const tile = this.waterTiles[i];
+      const s = this.worldToView(tile.x, tile.y);
+      if (s.x < -40 || s.x > this.viewW() + 40 || s.y < -20 || s.y > this.viewH() + 20) continue;
+      const tw = Math.sin(t * 3 + i);
+      if (tw <= 0.55) continue;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(s.x + tw * 3, s.y - 1 - tw * 2, 2, 1);
     }
     ctx.restore();
   }
 
   drawEffects(ctx, game) {
     for (const fx of game.effects) {
-      const s = this.worldToScreen(fx.x, fx.y);
+      const s = this.worldToView(fx.x, fx.y);
       const life = 1 - fx.life / fx.maxLife;
       if (fx.type === 'dmg') {
         ctx.save();
         ctx.globalAlpha = Math.min(1, fx.life / 0.4);
-        ctx.font = `bold ${fx.big ? 20 : 14}px Georgia, serif`;
+        ctx.font = `bold ${(fx.big ? 20 : 14) / this.viewZoom}px Georgia, serif`;
         ctx.textAlign = 'center';
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'rgba(10,8,16,0.85)';
@@ -834,9 +1134,18 @@ export class Renderer {
     }
     // projectiles
     for (const pr of game.projectiles) {
-      const s = this.worldToScreen(pr.x, pr.y);
+      const s = this.worldToView(pr.x, pr.y);
       ctx.save();
       if (pr.type === 'arrow') {
+        // motion streak
+        ctx.globalAlpha = 0.35;
+        ctx.strokeStyle = '#e8dcc0';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(s.x - 22, s.y - 40);
+        ctx.lineTo(s.x - 10, s.y - 42);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
         ctx.strokeStyle = '#e8dcc0';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -846,6 +1155,13 @@ export class Renderer {
         ctx.fillStyle = '#cfd8e2';
         ctx.fillRect(s.x + 5, s.y - 39, 4, 4);
       } else if (pr.type === 'fire') {
+        // trailing embers
+        ctx.globalAlpha = 0.4;
+        for (let i = 1; i <= 3; i++) {
+          ctx.fillStyle = i === 1 ? '#ffd166' : '#ff7a3c';
+          ctx.fillRect(s.x - 8 - i * 5, s.y - 33 - Math.sin(i) * 3, 2, 2);
+        }
+        ctx.globalAlpha = 1;
         const gr = ctx.createRadialGradient(s.x, s.y - 34, 1, s.x, s.y - 34, 10);
         gr.addColorStop(0, '#fff4c4');
         gr.addColorStop(0.4, '#ffb23e');
@@ -853,8 +1169,14 @@ export class Renderer {
         ctx.fillStyle = gr;
         ctx.fillRect(s.x - 12, s.y - 46, 24, 24);
       } else {
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = pr.color || '#b079ff';
+        ctx.fillRect(s.x - 10, s.y - 41, 9, 5);
+        ctx.globalAlpha = 1;
         ctx.fillStyle = pr.color || '#b079ff';
         ctx.fillRect(s.x - 3, s.y - 38, 6, 6);
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.fillRect(s.x - 2, s.y - 37, 2, 2);
         ctx.globalAlpha = 0.4;
         ctx.fillRect(s.x - 6, s.y - 41, 12, 12);
       }
@@ -863,7 +1185,7 @@ export class Renderer {
   }
 
   drawTargetRing(ctx, target) {
-    const s = this.worldToScreen(target.x, target.y);
+    const s = this.worldToView(target.x, target.y);
     ctx.save();
     ctx.strokeStyle = '#ff6a6a';
     ctx.lineWidth = 2;
@@ -875,7 +1197,7 @@ export class Renderer {
   }
 
   drawInteractRing(ctx, entity) {
-    const s = this.worldToScreen(entity.x, entity.y);
+    const s = this.worldToView(entity.x, entity.y);
     ctx.save();
     ctx.strokeStyle = '#ffe08a';
     ctx.lineWidth = 1.5;
@@ -888,7 +1210,8 @@ export class Renderer {
 
   drawWorldLabel(ctx, text, x, y, color, size) {
     ctx.save();
-    ctx.font = `${size}px Inter, system-ui, sans-serif`;
+    // world text is drawn inside the zoomed view — compensate so labels stay readable
+    ctx.font = `${(size / this.viewZoom).toFixed(1)}px Inter, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = 'rgba(8,6,14,0.85)';
