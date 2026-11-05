@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1119" />
+  <meta name="description" content="Aetheria — a 2.5D isometric fantasy MMORPG. Build, explore eight realms, and ascend." />
+  <title>AETHERIA · Realms of the Sundered Sky</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<svg aria-hidden="true" class="svg-defs">
+  <symbol id="i-sword" viewBox="0 0 24 24"><path d="M14.7 2.2 21 2l-.2 6.3L9.4 19.7l-4.9-4.9L14.7 2.2Zm-11 12 5.9 5.9-2.7 2.7-1.7-2.6-2.6-1.7 1.1-4.3Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 1.8 21 5v6.2c0 5.3-3.7 9.2-9 11-5.3-1.8-9-5.7-9-11V5l9-3.2Zm0 3.1L6 7.1v4.1c0 3.7 2.4 6.5 6 8 3.6-1.5 6-4.3 6-8V7.1l-6-2.2Z"/></symbol>
+  <symbol id="i-helm" viewBox="0 0 24 24"><path d="M4 11a8 8 0 0 1 16 0v7l-3-2v-4h-3v5H10v-5H7v5l-3 1v-7Zm5-7h6l2 3H7l2-3Z"/></symbol>
+  <symbol id="i-chest" viewBox="0 0 24 24"><path d="M6 2h5l1 2 1-2h5l2 5-3 1v13H7V8L4 7l2-5Zm2 8v10h8V10H8Z"/></symbol>
+  <symbol id="i-glove" viewBox="0 0 24 24"><path d="M7 3h3v7h1V2h3v8h1V3h3v9c0 5-2.4 9-6 10-3.3-.8-6-4.9-6-9V6l1-3Z"/></symbol>
+  <symbol id="i-boot" viewBox="0 0 24 24"><path d="M6 2h7v9l7 5v4l-4 2H4v-5l2-2V2Z"/></symbol>
+  <symbol id="i-belt" viewBox="0 0 24 24"><path d="M2 8h7v2h6V8h7v8h-7v-2H9v2H2V8Zm9 1v6h2V9h-2Z"/></symbol>
+  <symbol id="i-ring" viewBox="0 0 24 24"><path d="M12 7a6 6 0 1 0 0 12 6 6 0 0 0 0-12Zm0 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/><path d="m8 2 4 3 4-3-2 5h-4L8 2Z"/></symbol>
+  <symbol id="i-amulet" viewBox="0 0 24 24"><path d="M7 2h10l-4 6 2 3a6 6 0 1 1-6 0l2-3-4-6Zm5 10a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 6a4 4 0 0 1 8 0h4l2 16H2L4 6h4Zm2 0h4a2 2 0 0 0-4 0ZM7 10l-1 9h12l-1-9H7Z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="m2 4 7-2 6 2 7-2v18l-7 2-6-2-7 2V4Zm7 1v13l6 2V7L9 5Zm8 0v13l3-1V4l-3 1ZM4 5v13l3-1V4L4 5Z"/></symbol>
+  <symbol id="i-quest" viewBox="0 0 24 24"><path d="M5 2h14v20H5V2Zm3 3v2h8V5H8Zm0 4v2h8V9H8Zm0 4v2h5v-2H8Zm8 1 3 3-5 5-2-2 4-4-2-2 2-2Z"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="m7 2 10 0 5 7-10 13L2 9l5-7Zm1 3-2 4h4V5H8Zm6 0v4h4l-2-4h-2Zm-8 7 6 8-2-8H6Zm5 0 2 8 2-8h-4Zm6 0-2 8 6-8h-4Z"/></symbol>
+  <symbol id="i-hammer" viewBox="0 0 24 24"><path d="m13 2 9 9-3 3-4-2-8 8-4 1-1-4 8-8-2-4 5-3Zm2 3-1 2 3 3 2-1-4-4Z"/></symbol>
+  <symbol id="i-market" viewBox="0 0 24 24"><path d="M3 3h2l2 10h11l2-7H7v2h9l-1 3H8l1 4H20v2H7L4 3H2V1H3Zm4 15a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M3 3h7c1 0 2 .5 2 1.5C13 3.5 14 3 15 3h6v17h-6c-1 0-2 .4-2 1.2C12 20.4 11 20 10 20H3V3Zm2 2v13h5c.7 0 1.4.2 2 .5V6c-.6-.4-1.3-.6-2-.6H5Zm8 1.4v12c.6-.3 1.3-.5 2-.5h4V5h-4c-.7 0-1.4.2-2 .6Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10ZM2 22c0-5 4.5-8 10-8s10 3 10 8H2Z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9 1 6 0 .8 2.8 2.4 1.4L21 4l2 5-2 1.8v2.4L23 15l-2 5-2.8-1.2-2.4 1.4L15 23H9l-.8-2.8-2.4-1.4L3 20l-2-5 2-1.8v-2.4L1 9l2-5 2.8 1.2 2.4-1.4L9 1Zm3 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12Zm0 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 1 2.4 7.1L22 12l-7.6 3.9L12 23l-2.4-7.1L2 12l7.6-3.9L12 1Z"/></symbol>
+  <symbol id="i-wing" viewBox="0 0 24 24"><path d="M12 3c3-2 8-2 10 1-2 0-3 1-4 3 3 0 4 2 4 5-2-1-3 0-5 2 2 1 2 3 1 5-2-2-4-1-6 1V3Zm0 0C9 1 4 1 2 4c2 0 3 1 4 3-3 0-4 2-4 5 2-1 3 0 5 2-2 1-2 3-1 5 2-2 4-1 6 1V3Z"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm1 2v1.2c1.7.3 3 1.3 3 3h-2c0-.7-.5-1.2-1.5-1.2s-1.5.4-1.5 1 .6.9 1.8 1.2c1.7.4 3.2 1.1 3.2 2.9 0 1.5-1.2 2.6-3 2.9V20h-2v-1.2c-2-.3-3.2-1.4-3.2-3.1h2c0 .8.8 1.3 1.9 1.3 1.1 0 1.9-.4 1.9-1.1 0-.7-.8-1-2.1-1.3-1.6-.4-2.9-1.2-2.9-2.8 0-1.5 1.1-2.5 2.8-2.8V7h1.6Z"/></symbol>
+  <symbol id="i-potion" viewBox="0 0 24 24"><path d="M8 2h8v3l-2 1v4l3 4c2 3 .3 8-5 8s-7-5-5-8l3-4V6L8 5V2Zm0 12c-.7 1.8.2 5 4 5s4.7-3.2 4-5c-.8-2-2-2.6-2-4h-4c0 1.4-1.2 2-2 4Z"/></symbol>
+  <symbol id="i-skull" viewBox="0 0 24 24"><path d="M12 1C6.5 1 3 5 3 10c0 3 1.3 5 3 6v4h3v2h6v-2h3v-4c1.7-1 3-3 3-6 0-5-3.5-9-9-9ZM8 9a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm8 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4Zm-4 5 1.5 2h-3L12 14Z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 3 7 7 7-7 2 2-7 7 7 7-2 2-7-7-7 7-2-2 7-7-7-7 2-2Z"/></symbol>
+  <symbol id="i-mount" viewBox="0 0 24 24"><path d="M5 2c3 0 5 2 5 5l5-1 4 2-1 3-4 1 2 5 3 5h-3l-3-4-5 1-3 4H2l3-6-1-6-2-2 3-2V2Zm5 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></symbol>
+  <symbol id="i-pet" viewBox="0 0 24 24"><path d="M12 7c3.5 0 7 2.5 7 6.5 0 3-2.5 5.5-7 5.5s-7-2.5-7-5.5C5 9.5 8.5 7 12 7ZM6 2l2.5 5L5 8 3 3l3-1Zm12 0 3 1-2 5-3.5-1L18 2ZM9 12a1.2 1.2 0 1 0 0 2.4A1.2 1.2 0 0 0 9 12Zm6 0a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3 21 12 6 21V3Z"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m8 4 8 8-8 8-2-2 6-6-6-6 2-2Z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 1c2 5 7 6 7 12a7 7 0 0 1-14 0c0-3 1.5-5.5 3-7 .3 2 1.5 3 2.5 3C11.5 6 11 4 12 1Z"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 24 24"><path d="M4 2h16l2 6-2 2v12H4V10L2 8l2-6Zm2 8v10h12V10h-3v5h-2v-5h-2v5H9v-5H6Z"/></symbol>
+</svg>
+
+<div id="app">
+  <canvas id="gameCanvas" aria-label="Aetheria game world"></canvas>
+
+  <!-- CHARACTER CREATION -->
+  <section id="creationScreen" class="screen creation-screen">
+    <div class="creation-backdrop"></div>
+    <div class="creation-fog"></div>
+    <header class="creation-header">
+      <div class="brand-mark"><span class="brand-glyph">✦</span></div>
+      <div class="brand-copy">
+        <h1>AETHERIA</h1>
+        <p>REALMS OF THE SUNDERED SKY</p>
+      </div>
+      <div class="creation-header-right">
+        <span class="build-pill">OFFLINE SOLO · v1.0</span>
+        <button id="continueBtn" class="btn btn-ghost small hidden">Continue Journey</button>
+      </div>
+    </header>
+
+    <main class="creation-main">
+      <section class="creation-col identity-col">
+        <div class="section-eyebrow"><span>I</span> Choose Allegiance</div>
+        <div class="faction-row" role="group" aria-label="Faction">
+          <button class="faction-card active" data-faction="angel" type="button">
+            <span class="faction-emblem angel">✦</span>
+            <span class="faction-name">Angels</span>
+            <span class="faction-sub">The Luminari</span>
+          </button>
+          <button class="faction-card" data-faction="demon" type="button">
+            <span class="faction-emblem demon">◆</span>
+            <span class="faction-name">Demons</span>
+            <span class="faction-sub">The Emberkin</span>
+          </button>
+        </div>
+        <p class="faction-line" id="factionLine">Mercy is a blade held with purpose.</p>
+        <p class="faction-bonus" id="factionBonus"></p>
+
+        <div class="section-eyebrow spaced"><span>II</span> Choose a Calling</div>
+        <div class="class-list" role="group" aria-label="Class">
+          <button class="class-card active" data-class="dawnblade" type="button">
+            <span class="class-icon"><svg><use href="#i-sword"/></svg></span>
+            <span><strong>Dawnblade</strong><small>Vanguard · Longsword &amp; Aegis</small></span>
+            <span class="class-tag">Melee</span>
+          </button>
+          <button class="class-card" data-class="voidcaller" type="button">
+            <span class="class-icon"><svg><use href="#i-spark"/></svg></span>
+            <span><strong>Voidcaller</strong><small>Arcanist · Umbral Scepter</small></span>
+            <span class="class-tag">Ranged</span>
+          </button>
+          <button class="class-card" data-class="wildstalker" type="button">
+            <span class="class-icon"><svg><use href="#i-wing"/></svg></span>
+            <span><strong>Wildstalker</strong><small>Shadehunter · Stormfang Blades</small></span>
+            <span class="class-tag">Skirmish</span>
+          </button>
+        </div>
+
+        <div class="world-note">
+          <svg><use href="#i-spark"/></svg>
+          <span><strong>One shared world.</strong> Angels and Demons walk the same eight realms. Your allegiance changes your wings, not your welcome.</span>
+        </div>
+      </section>
+
+      <section class="creation-preview">
+        <div class="preview-frame">
+          <div class="frame-corner tl"></div><div class="frame-corner tr"></div>
+          <div class="frame-corner bl"></div><div class="frame-corner br"></div>
+          <div class="preview-glow"></div>
+          <canvas id="creationPreview" width="360" height="430" aria-label="Character preview"></canvas>
+          <div class="preview-title">
+            <span id="previewFaction">LUMINARI</span>
+            <h2 id="previewName">Aetherwyn</h2>
+            <p id="previewClass">Dawnblade · Vanguard</p>
+          </div>
+          <div class="preview-wing-note" id="wingNote"><svg><use href="#i-wing"/></svg> Wings unbound · earn them in the world or at the boutique</div>
+        </div>
+        <div class="preview-controls">
+          <button id="randomizeBtn" class="btn btn-ghost small" type="button"><svg><use href="#i-spark"/></svg> Randomize</button>
+          <span id="classBlurb">A blazing bulwark between light and dark.</span>
+        </div>
+      </section>
+
+      <section class="creation-col appearance-col">
+        <div class="section-eyebrow"><span>III</span> Shape Your Visage</div>
+        <label class="field-label" for="characterName">Name</label>
+        <input id="characterName" class="text-input" maxlength="18" value="Aetherwyn" autocomplete="off" />
+        <div class="field-row">
+          <div>
+            <label class="field-label">Gender</label>
+            <div class="segmented" id="genderGroup">
+              <button type="button" class="active" data-gender="female">Female</button>
+              <button type="button" data-gender="male">Male</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Marking</label>
+            <select id="markingSelect" class="text-input compact">
+              <option value="none">None</option>
+              <option value="rune">Rune Sigil</option>
+              <option value="scar">War Scar</option>
+              <option value="tears">Tear Lines</option>
+              <option value="freckles">Freckles</option>
+            </select>
+          </div>
+        </div>
+        <label class="field-label">Hairstyle</label>
+        <div class="hair-grid" id="hairGrid"></div>
+        <div class="swatch-block">
+          <label class="field-label">Hair color</label>
+          <div class="swatches" id="hairColorRow"></div>
+        </div>
+        <div class="swatch-block">
+          <label class="field-label">Eye color</label>
+          <div class="swatches" id="eyeColorRow"></div>
+        </div>
+        <div class="swatch-block">
+          <label class="field-label">Skin tone</label>
+          <div class="swatches" id="skinColorRow"></div>
+        </div>
+        <div class="cosmetic-note"><svg><use href="#i-gem"/></svg> Costumes, mounts and weapon effects are cosmetic only — never pay-to-win.</div>
+      </section>
+    </main>
+
+    <footer class="creation-footer">
+      <div class="creation-legal">A playable offline build. No real payments. Save data stays on this device.</div>
+      <button id="startGameBtn" class="btn btn-primary btn-large" type="button">
+        <span>Enter Aetheria</span><svg><use href="#i-play"/></svg>
+      </button>
+      <div class="creation-tech">2.5D isometric · local save · secure-online ready</div>
+    </footer>
+  </section>
+
+  <!-- GAME HUD -->
+  <section id="gameUI" class="game-ui hidden">
+    <header class="topbar">
+      <div class="hero-chip">
+        <div class="hero-crest" id="heroCrest">✦</div>
+        <div class="hero-id">
+          <div class="hero-name" id="hudName">Aetherwyn</div>
+          <div class="hero-sub" id="hudSub">Lv 1 Dawnblade · Luminari</div>
+        </div>
+        <div class="vital-stack">
+          <div class="vital-row health">
+            <span class="vital-label">HP</span>
+            <div class="vital-bar"><div class="vital-fill" id="hpFill"></div></div>
+            <span class="vital-value" id="hpText">0 / 0</span>
+          </div>
+          <div class="vital-row mana">
+            <span class="vital-label">MP</span>
+            <div class="vital-bar"><div class="vital-fill" id="manaFill"></div></div>
+            <span class="vital-value" id="manaText">0 / 0</span>
+          </div>
+          <div class="xp-row"><div class="xp-fill" id="xpFill"></div><span id="xpText">0 XP</span></div>
+        </div>
+      </div>
+      <div class="currency-strip">
+        <button class="currency-pill" data-panel="shop" title="Boutique"><svg class="gold"><use href="#i-coin"/></svg><span id="goldValue">0</span></button>
+        <button class="currency-pill" data-panel="shop" title="Boutique"><svg class="gem"><use href="#i-gem"/></svg><span id="gemValue">0</span></button>
+        <div class="status-pill" id="premiumPill"><svg><use href="#i-spark"/></svg><span>Skyward</span></div>
+        <span class="offline-pill" title="No other players are connected in this offline build">◉ OFFLINE</span>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" data-panel="codex" title="Codex &amp; settings"><svg><use href="#i-book"/></svg></button>
+        <button class="icon-btn" data-panel="settings" title="Settings"><svg><use href="#i-settings"/></svg></button>
+      </div>
+    </header>
+
+    <div class="region-badge" id="regionBadge">
+      <span class="region-eyebrow">CURRENT REALM</span>
+      <strong id="regionName">Greendale</strong>
+      <span id="regionEpithet">The Emerald Reach</span>
+    </div>
+
+    <aside class="quest-tracker" id="questTracker">
+      <div class="tracker-head"><svg><use href="#i-quest"/></svg><span>Trial Log</span><button data-panel="quests" class="mini-link">All</button></div>
+      <div id="trackerBody"></div>
+    </aside>
+
+    <div class="minimap-wrap">
+      <div class="minimap-frame">
+        <canvas id="minimap" width="180" height="180"></canvas>
+        <span class="compass-n">N</span>
+        <span class="compass-e">E</span>
+        <span class="compass-s">S</span>
+        <span class="compass-w">W</span>
+      </div>
+      <div class="minimap-meta"><span id="minimapRegion">Greendale</span><span id="minimapCoords">20, 42</span></div>
+    </div>
+
+    <aside class="side-rail">
+      <button class="rail-btn" data-panel="inventory" title="Inventory"><svg><use href="#i-bag"/></svg><span>Bag</span></button>
+      <button class="rail-btn" data-panel="character" title="Character"><svg><use href="#i-user"/></svg><span>Hero</span></button>
+      <button class="rail-btn" data-panel="map" title="World map"><svg><use href="#i-map"/></svg><span>Map</span></button>
+      <button class="rail-btn" data-panel="quests" title="Quests"><svg><use href="#i-quest"/></svg><span>Quests</span></button>
+      <button class="rail-btn" data-panel="shop" title="Boutique"><svg><use href="#i-shop"/></svg><span>Shop</span></button>
+      <button class="rail-btn" data-panel="forge" title="Forge"><svg><use href="#i-hammer"/></svg><span>Forge</span></button>
+      <button class="rail-btn" data-panel="market" title="Market"><svg><use href="#i-market"/></svg><span>Market</span></button>
+      <button class="rail-btn" data-panel="vault" title="Vault"><svg><use href="#i-chest"/></svg><span>Vault</span></button>
+    </aside>
+
+    <div class="boss-bar-wrap hidden" id="bossBar">
+      <div class="boss-bar-head"><span class="boss-kicker">ANCIENT THREAT</span><strong id="bossName">Boss</strong><span id="bossHpText"></span></div>
+      <div class="boss-bar"><div class="boss-fill" id="bossFill"></div></div>
+    </div>
+
+    <div class="bottom-controls">
+      <div class="joystick-cluster">
+        <div class="joystick" id="joystick" aria-label="Movement joystick">
+          <div class="joystick-grid"></div>
+          <div class="joystick-stick" id="joystickStick"><span>✦</span></div>
+          <span class="joystick-label">DRAG TO MOVE</span>
+        </div>
+        <div class="potion-stack">
+          <button class="potion-btn" id="healthPotionBtn" title="Health potion (R)"><svg><use href="#i-potion"/></svg><span class="potion-count" id="healthPotionCount">3</span></button>
+          <button class="potion-btn mana" id="manaPotionBtn" title="Mana potion"><svg><use href="#i-potion"/></svg><span class="potion-count" id="manaPotionCount">2</span></button>
+        </div>
+      </div>
+      <div class="action-cluster">
+        <button class="mount-btn" id="mountBtn" title="Mount / dismount"><svg><use href="#i-mount"/></svg><span id="mountLabel">Mount</span></button>
+        <button class="action-btn skill-btn" id="skillBtn" title="Main skill (Q)">
+          <span class="action-ring"></span>
+          <svg><use href="#i-spark"/></svg>
+          <span class="action-name" id="skillBtnName">Skill</span>
+          <span class="skill-level" id="skillLevelBadge">I</span>
+          <span class="cooldown-overlay" id="skillCooldown"></span>
+        </button>
+        <button class="action-btn attack-btn" id="attackBtn" title="Attack (Space)">
+          <span class="action-ring"></span>
+          <svg><use href="#i-sword"/></svg>
+          <span class="action-name">Attack</span>
+          <span class="cooldown-overlay" id="attackCooldown"></span>
+        </button>
+      </div>
+    </div>
+
+    <button class="interact-prompt hidden" id="interactPrompt"><kbd>E</kbd><span id="interactText">Interact</span></button>
+
+    <div class="location-actions">
+      <button class="small-chip" data-panel="map"><svg><use href="#i-map"/></svg> Waystones</button>
+      <button class="small-chip" id="quickVault"><svg><use href="#i-chest"/></svg> Vault</button>
+    </div>
+
+    <div class="toast-layer" id="toastLayer"></div>
+    <div class="region-banner hidden" id="regionBanner">
+      <span class="region-banner-kicker" id="regionBannerKicker">REALM ENTERED</span>
+      <strong id="regionBannerName">Greendale</strong>
+      <span id="regionBannerSub">The Emerald Reach · Levels 1–7</span>
+    </div>
+
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="loading-emblem">✦</div>
+      <div class="loading-title">AETHERIA</div>
+      <div class="loading-text" id="loadingText">Entering the realm...</div>
+      <div class="loading-track"><span></span></div>
+    </div>
+
+    <div class="death-overlay hidden" id="deathOverlay">
+      <div class="death-panel">
+        <span class="death-mark">☩</span>
+        <h2>Your Light Fades</h2>
+        <p>The waystone remembers your name. Return to the village and try again.</p>
+        <button class="btn btn-primary" id="respawnBtn">Return to the Waystone</button>
+        <small>No equipment is lost on death.</small>
+      </div>
+    </div>
+    <div class="damage-flash" id="damageFlash"></div>
+    <div class="save-flash" id="saveFlash">✓ Saved locally</div>
+    <div class="fade-layer" id="fadeLayer"></div>
+  </section>
+
+  <!-- MODAL PANEL -->
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <section class="modal-panel" role="dialog" aria-modal="true">
+      <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+      <header class="panel-head">
+        <div><div class="panel-kicker" id="panelKicker">SATCHEL</div><h2 id="panelTitle">Inventory</h2></div>
+        <button class="close-btn" id="panelClose" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+      </header>
+      <div class="panel-tabs" id="panelTabs"></div>
+      <div class="panel-scroll" id="panelBody"></div>
+      <footer class="panel-foot" id="panelFoot"></footer>
+    </section>
+  </div>
+
+  <!-- DIALOGUE -->
+  <div id="dialogueBackdrop" class="dialogue-backdrop hidden">
+    <section class="dialogue-panel">
+      <div class="dialogue-portrait"><canvas id="dialoguePortrait" width="220" height="260"></canvas><span class="portrait-ring"></span></div>
+      <div class="dialogue-copy">
+        <div class="dialogue-kicker" id="dialogueKicker">WARDEN OF OAKHAVEN</div>
+        <h2 id="dialogueName">Warden Elowen</h2>
+        <p id="dialogueText"></p>
+        <div class="dialogue-actions" id="dialogueActions"></div>
+      </div>
+      <button class="close-btn dialogue-close" id="dialogueClose"><svg><use href="#i-close"/></svg></button>
+    </section>
+  </div>
+
+  <!-- PROMPT -->
+  <div id="promptBackdrop" class="prompt-backdrop hidden">
+    <section class="prompt-panel">
+      <div class="panel-kicker" id="promptKicker">CONFIRM</div>
+      <h2 id="promptTitle">Are you sure?</h2>
+      <p id="promptText"></p>
+      <label class="field-label" id="promptLabelWrap"><span id="promptLabel">Value</span><input class="text-input" id="promptInput" /></label>
+      <div class="prompt-actions"><button class="btn btn-ghost" id="promptCancel">Cancel</button><button class="btn btn-primary" id="promptConfirm">Confirm</button></div>
+    </section>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
