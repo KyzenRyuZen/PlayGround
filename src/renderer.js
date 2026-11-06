@@ -379,6 +379,25 @@ export class Renderer {
       ctx.fillStyle = shade(base, 0.1);
       ctx.fillRect(cx - 14, cy - 2, 28, 1);
     }
+
+    // Fine beveling keeps neighbouring tiles readable without breaking the
+    // intentionally soft, painterly ground palette.
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = type === 'shore' ? 'rgba(255,244,198,0.18)' : 'rgba(4,3,10,0.16)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - h + 0.5);
+    ctx.lineTo(cx + w - 0.5, cy);
+    ctx.lineTo(cx, cy + h - 0.5);
+    ctx.lineTo(cx - w + 0.5, cy);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - h + 1);
+    ctx.lineTo(cx + w - 1, cy);
+    ctx.stroke();
+    ctx.restore();
   }
 
   // ------------------------------------------------------------
@@ -701,10 +720,18 @@ export class Renderer {
   // ------------------------------------------------------------
   drawShadow(ctx, sx, sy, w, alpha = 0.28) {
     ctx.save();
-    ctx.globalAlpha = alpha;
+    const glow = ctx.createRadialGradient(sx, sy + 2, 0, sx, sy + 2, w * 1.15);
+    glow.addColorStop(0, `rgba(4,3,10,${alpha})`);
+    glow.addColorStop(0.7, `rgba(4,3,10,${alpha * 0.62})`);
+    glow.addColorStop(1, 'rgba(4,3,10,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(sx, sy + 2, w * 1.15, w * 0.48, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = Math.min(0.42, alpha + 0.08);
     ctx.fillStyle = '#08060d';
     ctx.beginPath();
-    ctx.ellipse(sx, sy + 2, w, w * 0.4, 0, 0, Math.PI * 2);
+    ctx.ellipse(sx, sy + 1, w * 0.78, w * 0.27, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -909,6 +936,16 @@ export class Renderer {
       ctx.restore();
     }
     this.drawShadow(ctx, s.x, s.y, mount ? 24 : 13, mount ? 0.32 : 0.26);
+    // A restrained ground sigil anchors the hero against busy terrain.
+    ctx.save();
+    ctx.globalAlpha = 0.18 + (aura ? aura.strength * 0.025 : 0);
+    ctx.strokeStyle = aura?.color || '#e6c46a';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y + 1, mount ? 28 : 18, mount ? 9 : 6, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
 
     // arcane sigil while casting
     if (game.player.casting) {
