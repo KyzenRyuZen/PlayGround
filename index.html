@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#101a20" />
+  <meta name="description" content="Aetheria — a hand-crafted fantasy adventure." />
+  <title>AETHERIA — Realms Awaken</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Marcellus&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="creation" class="creation-screen">
+      <div class="creation-art"><div class="art-moon"></div><div class="art-mountains"></div><div class="art-silhouette"></div><span class="art-caption">A WORLD BETWEEN<br>LIGHT & SHADOW</span></div>
+      <div class="creation-panel">
+        <div class="brand-mark"><span class="brand-glyph">✦</span><span>AETHERIA</span><small>REALMS AWAKEN</small></div>
+        <div class="create-content">
+          <div class="eyebrow">YOUR STORY BEGINS</div>
+          <h1>Shape your<br><em>destiny.</em></h1>
+          <p class="muted intro-copy">Choose who you are. The realms will remember.</p>
+          <label class="field-label" for="hero-name">CHARACTER NAME</label>
+          <input id="hero-name" class="name-input" maxlength="16" placeholder="Enter a name..." value="Aster" autocomplete="off" />
+          <div class="creator-row">
+            <div class="creator-group"><span class="field-label">PRESENTATION</span><div class="segmented" id="gender-options"><button data-gender="female" class="selected">♀ <span>Female</span></button><button data-gender="male">♂ <span>Male</span></button></div></div>
+            <div class="creator-group"><span class="field-label">APPEARANCE</span><div class="swatches" id="hair-swatches" aria-label="Hair color"></div></div>
+          </div>
+          <span class="field-label faction-label">CHOOSE YOUR FACTION</span>
+          <div class="faction-cards">
+            <button class="faction-card angel selected" data-faction="Angels"><span class="faction-symbol">☼</span><span><b>Angels</b><small>Oathbound to the light</small></span><i>✓</i></button>
+            <button class="faction-card demon" data-faction="Demons"><span class="faction-symbol">♆</span><span><b>Demons</b><small>Forged in the ember</small></span><i>✓</i></button>
+          </div>
+          <span class="field-label class-label">CHOOSE YOUR PATH</span>
+          <div class="class-cards">
+            <button class="class-card selected" data-class="Warrior"><span class="class-icon">⚔</span><b>Warrior</b><small>Strength · Melee</small></button>
+            <button class="class-card" data-class="Mage"><span class="class-icon">✧</span><b>Mage</b><small>Arcana · Ranged</small></button>
+            <button class="class-card" data-class="Assassin"><span class="class-icon">⌁</span><b>Assassin</b><small>Speed · Critical</small></button>
+          </div>
+          <div class="creator-extras">
+            <label>Eyes <select id="eye-color"><option>Jade</option><option>Amethyst</option><option>Azure</option><option>Amber</option></select></label>
+            <label>Style <select id="outfit"><option>Wayfarer</option><option>Sentinel</option><option>Runebound</option></select></label>
+            <label>Hair <select id="hair-style"><option>Long braid</option><option>Windswept</option><option>Short crop</option></select></label>
+          </div>
+          <div class="create-footer"><span class="local-note"><span class="online-dot"></span> Single-player journey · progress saved here</span><button id="begin-btn" class="primary-btn">ENTER AETHERIA <span>→</span></button></div>
+          <p class="server-note">Your adventure is a local simulation. Online realms are not connected.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="game" class="game-screen hidden">
+      <header class="topbar">
+        <button class="mini-brand" id="brand-home"><span>✦</span> AETHERIA</button>
+        <div class="location-name"><span class="location-pin">⌖</span><div><b id="location-title">DAWNSHIRE</b><small id="location-subtitle">GREENDALE · SAFE HAVEN</small></div></div>
+        <div class="currency"><span class="coin">◈</span><b id="gold-count">120</b><span class="gem">◆</span><b id="gem-count">8</b></div>
+        <button class="avatar-mini" id="profile-btn" aria-label="Character profile"><span id="avatar-initial">A</span><i></i></button>
+      </header>
+      <div class="game-layout">
+        <section class="world-shell">
+          <canvas id="world" aria-label="Aetheria game world"></canvas>
+          <div class="world-vignette"></div>
+          <div class="world-top-hud">
+            <div class="hero-status"><div class="hero-avatar" id="hero-avatar">A</div><div class="hero-bars"><div class="hero-name-row"><b id="hud-name">Aster</b><span id="level-label">LV. 1 · WARRIOR</span></div><div class="bar hp"><span id="hp-fill"></span><small id="hp-text">120 / 120</small></div><div class="bar mp"><span id="mp-fill"></span><small id="mp-text">55 / 55</small></div></div></div>
+            <div class="xp-row"><span>XP</span><div class="bar xp"><span id="xp-fill"></span></div><small id="xp-text">0 / 100</small></div>
+            <button id="map-btn" class="map-chip"><span>⌖</span><b>MAP</b><small>1/8</small></button>
+          </div>
+          <div class="quest-tracker" id="quest-tracker"><div class="quest-tracker-head"><span>ACTIVE QUEST</span><button id="collapse-quest">−</button></div><b id="quest-title">A Quieting in the Fields</b><small id="quest-objective">Defeat 3 Meadow Slimes <span>0/3</span></small><div class="quest-progress"><i id="quest-progress-fill"></i></div></div>
+          <div class="toast" id="toast"></div>
+          <div id="interact-prompt" class="interact-prompt hidden"><span>✧</span><b>Talk</b><small id="interact-name">Mira</small></div>
+          <div class="combat-float" id="combat-float"></div>
+          <div class="world-bottom-hud">
+            <div class="left-controls"><div class="joystick" id="joystick"><div class="joystick-ring"><div class="joystick-knob" id="joystick-knob"></div></div><span class="joystick-hint">MOVE</span></div><button id="mount-btn" class="round-action" title="Mount">♘</button></div>
+            <div class="right-controls"><button id="auto-btn" class="auto-btn"><span>◉</span> AUTO <i></i></button><div class="combat-buttons"><button id="potion-btn" class="utility-button"><span>✚</span><small>POTION</small><i id="potion-count">3</i></button><button id="attack-btn" class="attack-button"><span>⚔</span><small>ATTACK</small></button><button id="skill-btn" class="skill-button"><span id="skill-glyph">✦</span><small id="skill-name">SKILL</small><i id="skill-cooldown"></i></button></div></div>
+          </div>
+        </section>
+        <aside class="side-rail">
+          <div class="rail-title">ADVENTURER</div>
+          <button data-panel="bag"><span>▣</span><b>Inventory</b><small id="bag-count">4/36</small></button>
+          <button data-panel="equipment"><span>♢</span><b>Equipment</b><small>9 slots</small></button>
+          <button data-panel="quests"><span>✧</span><b>Quests</b><i class="rail-dot"></i></button>
+          <button data-panel="world"><span>⌖</span><b>World map</b><small>1/8</small></button>
+          <div class="rail-divider"></div><div class="rail-title">REALM</div>
+          <button data-panel="craft"><span>⚒</span><b>Forge</b><small>Craft & fuse</small></button>
+          <button data-panel="market"><span>⇄</span><b>Marketplace</b><small>Local listings</small></button>
+          <button data-panel="shop"><span>✦</span><b>Sanctum</b><small>Cosmetics</small></button>
+          <div class="rail-bottom"><span class="online-dot"></span> OFFLINE MODE<small>Local save · v1.0</small></div>
+        </aside>
+      </div>
+      <nav class="mobile-nav"><button data-panel="bag"><span>▣</span>Bag</button><button data-panel="equipment"><span>♢</span>Gear</button><button data-panel="quests"><span>✧</span>Quests</button><button data-panel="world"><span>⌖</span>Map</button><button data-panel="shop"><span>✦</span>More</button></nav>
+    </section>
+    <div id="modal-root"></div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>
