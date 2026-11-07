@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101114"><title>INFINITE HERO — Ewige Jagd</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Infinite Hero Start"><span class="brand-mark">✦</span><span>INFINITE<small>H E R O</small></span></a>
+      <div class="side-label">DAS ABENTEUER</div>
+      <nav class="main-nav" aria-label="Hauptnavigation">
+        <button class="nav-item active" data-view="battle"><span>⚔</span> Abenteuer <b class="nav-live">LIVE</b></button>
+        <button class="nav-item" data-view="character"><span>♙</span> Held & Werte</button>
+        <button class="nav-item" data-view="inventory"><span>▦</span> Inventar <i id="bag-count">0</i></button>
+        <button class="nav-item" data-view="skills"><span>✧</span> Talente <i id="skill-count">0</i></button>
+        <button class="nav-item" data-view="world"><span>⌖</span> Weltkarte</button>
+      </nav>
+      <div class="side-label side-label-lower">DEIN VERMÄCHTNIS</div>
+      <div class="legacy-card"><div class="legacy-icon">♜</div><div><b>Vermächtnis</b><span id="legacy-side">0 Splitter</span></div><button id="prestige-open" title="Prestige">›</button></div>
+      <div class="sidebar-bottom"><div class="online-dot"></div><span>Dein Fortschritt wird gespeichert</span><span class="save-check">✓</span></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar"><div class="mobile-brand">✦ <span>INFINITE HERO</span></div><div class="breadcrumb"><span>EWIGE JAGD</span><b>/</b><span id="crumb-area">DÄMMERWALD</span></div><div class="top-actions"><div class="currency"><span class="gold-icon">◈</span><span id="gold-top">0</span><small>GOLD</small></div><button class="icon-btn" id="sound-btn" title="Kampfautomatik an/aus">Ⅱ</button><button class="avatar-mini" id="open-profile">A</button></div></header>
+      <div id="view-battle" class="view active-view">
+        <section class="hero-heading"><div><div class="eyebrow"><span class="live-dot"></span> DEINE SAGA GEHT WEITER</div><h1>Die Jagd <em>ruft.</em></h1><p>Jeder Kampf macht dich stärker. Wie weit wirst du gehen?</p></div><button class="daily-pill" id="daily-btn"><span>☼</span><span><b>Tagessegen</b><small id="daily-copy">Belohnung abholen</small></span><i>›</i></button></section>
+        <section class="progress-card"><div class="progress-top"><div class="level-seal"><span>LVL</span><b id="level">1</b></div><div class="progress-info"><div class="progress-label"><b id="hero-name">Wanderer</b><span id="level-progress">0 / 40 EP</span></div><div class="xp-track"><div id="xp-fill"></div></div><div class="xp-caption"><span>NÄCHSTER AUFSTIEG</span><span id="xp-remaining">Noch 40 EP</span></div></div><div class="progress-stat"><small>KAMPFKRAFT</small><b>⚔ <span id="power">12</span></b></div><button id="level-up-btn" class="level-up-btn hidden">+ <span>Aufstieg</span></button></div></section>
+        <section class="battle-layout">
+          <div class="battle-column">
+            <div class="section-head"><div><span class="eyebrow">GEBIET <span id="area-number">01</span></span><h2 id="area-name">Dämmerwald</h2></div><button class="ghost-btn" id="change-area">Gebiet wählen <span>⌄</span></button></div>
+            <article class="arena" id="arena">
+              <div class="arena-mist"></div><div class="arena-stars">✦　 ·　　 ✧　　·　✦</div>
+              <div class="arena-location"><span>⌖</span><span id="arena-area">DÄMMERWALD · WALDRAND</span></div>
+              <div class="enemy-wrap" id="enemy-wrap"><div class="enemy-aura"></div><div class="enemy-emoji" id="enemy-emoji">🐺</div><div class="enemy-shadow"></div><div class="enemy-name" id="enemy-name">Nebelwolf</div><div class="enemy-tags"><span id="enemy-rank">WILD</span><span id="enemy-level">LVL 1</span></div></div>
+              <div class="arena-toast" id="arena-toast"></div>
+              <div class="player-combat"><div class="player-orb">✦</div><div class="player-combat-info"><span id="player-combat-name">Wanderer</span><div class="health-track"><div id="player-hp-fill"></div></div><small><span id="player-hp">100</span> / <span id="player-maxhp">100</span> LP</small></div><div class="vs">VS</div><div class="enemy-health"><div class="health-track enemy-track"><div id="enemy-hp-fill"></div></div><small><span id="enemy-hp">35</span> / <span id="enemy-maxhp">35</span> LP</small></div></div>
+            </article>
+            <div class="combat-controls"><button class="attack-btn" id="attack-btn"><span>⚔</span> ANGREIFEN <kbd>LEERTASTE</kbd></button><button class="skill-combat-btn" id="combat-skill" title="Fähigkeit einsetzen">✧ <span>Arkanschlag</span><small>Q</small></button><button class="potion-btn" id="potion-btn" title="Heiltrank benutzen">⚗ <span id="potion-count">3</span></button><div class="auto-toggle"><span class="auto-indicator"></span><span>Auto-Kampf</span><button class="toggle on" id="auto-toggle" aria-label="Auto-Kampf umschalten"><i></i></button></div></div>
+            <div class="combat-log-card"><div class="log-title"><span>✧</span> KAMPFCHRONIK <button id="clear-log">LEEREN</button></div><div id="combat-log" class="combat-log"><div class="log-line"><i>✦</i> Deine Reise beginnt. Der Wald beobachtet dich.</div></div></div>
+          </div>
+          <aside class="right-rail">
+            <div class="rail-card enemy-reward"><div class="rail-title"><span>AKTUELLES ZIEL</span><button id="target-info">···</button></div><div class="target-name" id="target-title">Nebelwolf <span>◈</span></div><div class="target-details"><span>⚔ <b id="enemy-attack">5</b> Angriff</span><span>♧ <b id="enemy-xp">18</b> EP</span></div><div class="reward-line"><span>BELOHNUNG</span><b>◈ <span id="enemy-gold">8–14</span> Gold</b></div></div>
+            <div class="rail-card gear-card"><div class="rail-title">AUSRÜSTUNG <button class="text-link" data-goto="character">ALLE ›</button></div><div id="gear-preview" class="gear-preview"></div><button class="upgrade-quick" id="quick-upgrade"><span>✧</span><span><b>Ausrüstung schmieden</b><small>Verbessere dein bestes Item</small></span><i>›</i></button></div>
+            <div class="rail-card quest-card"><div class="rail-title">JAGDAUFTRAG <span class="quest-refresh">☼</span></div><div class="quest-title" id="quest-title">Waldsäuberung</div><p id="quest-desc">Besiege 5 Kreaturen</p><div class="quest-progress"><div id="quest-fill"></div></div><div class="quest-footer"><span id="quest-count">0 / 5</span><button id="quest-claim" disabled>ABHOLEN</button></div></div>
+            <div class="boss-callout" id="boss-callout"><div class="boss-icon">♛</div><div><small>NÄCHSTER BOSS</small><b id="boss-name">Der Wurzelhüter</b><span id="boss-distance">Noch 4 Siege</span></div><span class="boss-arrow">›</span></div>
+          </aside>
+        </section>
+      </div>
+      <div id="view-character" class="view"><section class="page-heading"><div class="eyebrow">DEIN WEG ZUR LEGENDE</div><h1>Held & <em>Werte</em></h1><p>Jeder Aufstieg bringt freie Attributpunkte. Gestalte deinen Kampfstil.</p></section><div class="character-grid"><div class="panel character-card"><div class="portrait">✦<span id="portrait-level">01</span></div><h2 id="char-name">Wanderer</h2><p>Unermüdlicher Abenteurer</p><div class="char-xp"><span>LEVEL <b id="char-level">1</b></span><span id="char-xp-label">0 / 40 EP</span><div class="xp-track"><div id="char-xp-fill"></div></div></div><button class="rename-btn" id="rename-btn">✎ Namen ändern</button></div><div class="panel attributes-panel"><div class="panel-heading"><div><span class="eyebrow">HELDENWERTE</span><h2>Attribute</h2></div><span class="points-pill" id="stat-points">0 PUNKTE</span></div><div id="attributes-list" class="attributes-list"></div><div class="derived-stats"><div><small>ANGRIFF</small><b id="stat-attack">12</b></div><div><small>MAX. LEBEN</small><b id="stat-health">100</b></div><div><small>KAMPFKRAFT</small><b id="stat-power">12</b></div></div></div><div class="panel equipped-panel"><div class="panel-heading"><div><span class="eyebrow">DEINE RELIQUIEN</span><h2>Ausrüstung</h2></div><button class="text-link" data-goto="inventory">INVENTAR ›</button></div><div id="equipment-grid" class="equipment-grid"></div></div></div></div>
+      <div id="view-inventory" class="view"><section class="page-heading"><div class="eyebrow">DEINE BEUTE</div><h1>Inventar & <em>Schmiede</em></h1><p>Rüste dich aus, verwerte Duplikate oder schmiede deine Ausrüstung stärker.</p></section><div class="inventory-layout"><div class="panel inventory-panel"><div class="inventory-toolbar"><div><span class="eyebrow">GEFUNDENE SCHÄTZE</span><h2>Inventar <small id="inventory-count">0 / 60</small></h2></div><div class="filter-tabs"><button class="filter active" data-filter="all">Alle</button><button class="filter" data-filter="weapon">Waffen</button><button class="filter" data-filter="armor">Rüstung</button><button class="filter" data-filter="jewelry">Schmuck</button></div></div><div id="inventory-list" class="inventory-list"></div></div><aside class="panel forge-panel"><span class="eyebrow">DIE ALTE SCHMIEDE</span><h2>Schmiede</h2><p>Wähle ein Item aus deinem Inventar, um es zu verbessern.</p><div id="forge-selection" class="forge-selection"><div class="forge-placeholder">⚒<span>Wähle einen Gegenstand</span></div></div><button class="primary-btn full-btn" id="forge-upgrade" disabled>✧ AUFWERTEN</button><button class="secondary-btn full-btn" id="forge-combine" disabled>⟡ DUPLIKATE VERSCHMELZEN</button><div class="forge-note">Aufwertung kostet Gold. Verschmelzen verbraucht zwei gleiche Items für einen mächtigen Rangaufstieg.</div></aside></div></div>
+      <div id="view-skills" class="view"><section class="page-heading"><div class="eyebrow">MEISTERSCHAFT & MACHT</div><h1>Dein <em>Talentbaum</em></h1><p>Investiere Talentpunkte in passive Stärken und aktive Fähigkeiten.</p></section><div class="skill-summary"><span>✧</span><div><b id="talent-points">0 Talentpunkte verfügbar</b><small>Talentpunkte erhältst du bei jedem zweiten Levelaufstieg.</small></div></div><div id="skills-grid" class="skills-grid"></div><div class="panel achievements-panel"><div class="panel-heading"><div><span class="eyebrow">DEIN VERMÄCHTNIS</span><h2>Erfolge</h2></div><span class="achievement-count" id="achievement-count">0 / 0</span></div><div id="achievements-list" class="achievements-list"></div></div></div>
+      <div id="view-world" class="view"><section class="page-heading"><div class="eyebrow">DIE WELT IST WEIT</div><h1>Gebiete & <em>Dungeons</em></h1><p>Dringe tiefer in die endlose Wildnis vor. Alle fünf Gebiete wartet ein Boss.</p></section><div class="world-banner"><div><span class="eyebrow">DEINE GRENZE</span><h2>Gebiet <span id="world-current">1</span> — <b id="world-name">Dämmerwald</b></h2><p>Besiege den Gebiets-Boss, um das nächste Reich freizuschalten.</p></div><div class="world-banner-icon">⌖</div></div><div id="world-grid" class="world-grid"></div><div class="panel dungeon-panel"><div class="dungeon-art">⌬</div><div><span class="eyebrow">INSTANZ · EINMAL PRO GEBIET</span><h2 id="dungeon-title">Wurzelkrypta</h2><p>Bezwinge eine Welle mächtiger Elitegegner und hole dir eine garantiert seltene Beute.</p></div><button class="primary-btn" id="dungeon-btn">DUNGEON BETRETEN <span>›</span></button></div></div>
+      <footer class="footer"><span>INFINITE HERO</span><span>Kein Ende. Nur der nächste Horizont.</span><button id="reset-btn">SPIEL NEU STARTEN</button></footer>
+    </main>
+  </div>
+  <div class="modal-backdrop hidden" id="modal"><div class="modal-card" id="modal-content"></div></div>
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+  <script src="game.js"></script>
+</body>
+</html>
