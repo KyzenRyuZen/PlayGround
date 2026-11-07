@@ -917,12 +917,13 @@ export class UI {
     const state = this.state;
     const current = state.region();
     const inDungeon = game?.currentDungeon;
+    const returnOnly = REGION_ORDER.indexOf(state.char.region) > 1;
     return `
-      <p class="panel-lead">Teleport through the ley network. Costs scale with distance: <b>same region 500</b> · nearby 2,000 · medium 5,000 · far 10,000 · endgame 20,000. Dungeons cost <b>25,000–50,000</b>.</p>
-      ${inDungeon ? `<div class="card mb8"><div class="row between"><div><h4 style="margin:0">Dungeon: ${inDungeon.name}</h4><div class="sub">${inDungeon.desc}</div></div><button class="btn btn-sm" data-act="return-hub">Return to hub · 500g</button></div></div>` : ''}
+      <p class="panel-lead">${returnOnly ? 'The frontier leyline returns you to Greendale. Quest keepers remain available here.' : 'Teleport through the ley network. Costs scale with distance: <b>same region 500</b> · nearby 2,000 · medium 5,000 · far 10,000 · endgame 20,000. Dungeons cost <b>25,000–50,000</b>.'}</p>
+      ${inDungeon ? `<div class="card mb8"><div class="row between"><div><h4 style="margin:0">Dungeon: ${inDungeon.name}</h4><div class="sub">${inDungeon.desc}</div></div><button class="btn btn-sm" data-act="return-hub">Return to ${returnOnly ? 'Greendale' : 'hub'} · 500g</button></div></div>` : ''}
       <div class="section-title">Regions</div>
       <div class="panel-grid grid-2">
-        ${REGION_ORDER.map((id, i) => {
+        ${REGION_ORDER.filter(id => !returnOnly || id === 'greendale').map((id, i) => {
           const r = REGIONS[id];
           const isCurrent = id === state.char.region && !inDungeon;
           const cost = isCurrent ? 0 : (game ? game.teleportCostTo(id) : state.teleportCost(state.char.region, id));
@@ -935,7 +936,7 @@ export class UI {
           </div>`;
         }).join('')}
       </div>
-      <div class="section-title">Dungeons</div>
+      ${returnOnly ? '' : `<div class="section-title">Dungeons</div>
       <div class="panel-grid grid-2">
         ${DUNGEONS.map(d => {
           const boss = MONSTERS[d.boss];
@@ -946,8 +947,8 @@ export class UI {
             <button class="btn btn-sm btn-primary mt8" data-act="dungeon" data-id="${d.id}">Enter dungeon</button>
           </div>`;
         }).join('')}
-      </div>
-      <div class="note mt12">Dungeons and bosses respawn over time. Travel between regions uses the ley network (the Teleporter). Free walking covers the roads, villages and wilds inside each region.</div>
+      </div>`}
+      ${returnOnly ? '' : '<div class="note mt12">Dungeons and bosses respawn over time. Travel between regions uses the ley network (the Teleporter). Free walking covers the roads, villages and wilds inside each region.</div>'}
     `;
   }
 

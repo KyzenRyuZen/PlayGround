@@ -68,7 +68,7 @@ function setTile(world, x, y, type, variant) {
   if (!t) return;
   t.type = type;
   if (variant != null) t.variant = variant;
-  if (type === 'water' || type === 'void') t.blocked = true;
+  t.blocked = type === 'water' || type === 'void';
 }
 
 function markDisc(world, cx, cy, radius, type, onlyIf = null) {
@@ -174,7 +174,7 @@ function placeLair(world, region, rng) {
 
 function makeNodes(world, region, rng) {
   const nodes = [];
-  const count = 8;
+  const count = Math.max(8, Math.round(world.size * 0.28));
   for (let i = 0; i < count; i++) {
     let x, y, tries = 0;
     do {
@@ -224,7 +224,7 @@ export function buildWorld(regionId, opts = {}) {
       const n = rng.next();
       if (n > 0.93) type = 'ground2';
       else if (n > 0.83) type = 'ground3';
-      if (edge && region.ground === 'void') type = 'void';
+      if (edge && regionId === 'tower') type = 'void';
       world.tiles[idx(size, x, y)] = { x, y, type, variant: rng.int(0, 999), blocked: type === 'void' };
     }
   }
@@ -258,7 +258,7 @@ export function buildWorld(regionId, opts = {}) {
   // NPCs
   const localNpcs = Object.values(NPCS).filter(n => n.region === regionId);
   const npcList = [...localNpcs];
-  if (regionId !== 'greendale') {
+  if (regionId === 'ironcrag') {
     const provision = {
       id: `provision_${regionId}`, name: 'Camp Provisioner', role: 'Potion Merchant', icon: '⚗',
       color: '#69c5a8', region: regionId, dx: 3.6, dy: 1.4, greeting: 'Potions, tonics and bandages. The frontier is expensive.'

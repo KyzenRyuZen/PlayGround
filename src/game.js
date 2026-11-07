@@ -777,6 +777,10 @@ export class Game {
     if (this.transitioning) return false;
     if (!REGIONS[regionId]) return false;
     const from = this.currentDungeon ? this.currentDungeon.region : this.state.char.region;
+    if (REGION_ORDER.indexOf(from) > 1 && regionId !== 'greendale') {
+      Events.emit('toast', { msg: 'This leyline only returns you to Greendale.', type: 'info' });
+      return false;
+    }
     if (regionId === from && !this.currentDungeon && opts.force !== true) {
       // fast travel within the same region: still costs the same-region fee
     }
@@ -804,12 +808,13 @@ export class Game {
 
   returnToHub() {
     const base = this.currentDungeon ? this.currentDungeon.region : this.state.char.region;
+    const destination = REGION_ORDER.indexOf(base) > 1 ? 'greendale' : base;
     const cost = this.currentDungeon ? CONFIG.teleport.same : 0;
     if (cost && !this.state.spendGold(cost, 'teleport', 'Return to hub')) {
       Events.emit('toast', { msg: 'Not enough gold to return.', type: 'warn' });
       return;
     }
-    this.enterRegion(base, { initial: false });
+    this.enterRegion(destination, { initial: false });
   }
 
   playerDie() {
@@ -831,8 +836,9 @@ export class Game {
     if (this.player.deathTimer <= 0) {
       this.player.dead = false;
       const base = this.currentDungeon ? this.currentDungeon.region : this.state.char.region;
+      const destination = REGION_ORDER.indexOf(base) > 1 ? 'greendale' : base;
       this.state.char.buffs = [];
-      this.enterRegion(base, { initial: false, x: null, y: null });
+      this.enterRegion(destination, { initial: false, x: null, y: null });
       setTimeout(() => {
         const st = this.state.stats();
         this.state.char.hp = Math.floor(st.maxHp * CONFIG.combat.playerRespawnHp);
