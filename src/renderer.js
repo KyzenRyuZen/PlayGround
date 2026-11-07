@@ -380,11 +380,11 @@ export class Renderer {
       ctx.fillRect(cx - 14, cy - 2, 28, 1);
     }
 
-    // Fine beveling keeps neighbouring tiles readable without breaking the
-    // intentionally soft, painterly ground palette.
+    // Keep the diamond seams quiet, then use a directional bevel to give the
+    // ground depth without making the whole world read like a rigid grid.
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = type === 'shore' ? 'rgba(255,244,198,0.18)' : 'rgba(4,3,10,0.16)';
+    ctx.strokeStyle = type === 'shore' ? 'rgba(255,244,198,0.14)' : 'rgba(4,3,10,0.09)';
     ctx.beginPath();
     ctx.moveTo(cx, cy - h + 0.5);
     ctx.lineTo(cx + w - 0.5, cy);
@@ -392,10 +392,15 @@ export class Renderer {
     ctx.lineTo(cx - w + 0.5, cy);
     ctx.closePath();
     ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.045)';
+    ctx.strokeStyle = type === 'shore' ? 'rgba(255,248,218,0.2)' : 'rgba(255,245,214,0.075)';
     ctx.beginPath();
     ctx.moveTo(cx, cy - h + 1);
-    ctx.lineTo(cx + w - 1, cy);
+    ctx.lineTo(cx - w + 1, cy);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(5,4,10,0.12)';
+    ctx.beginPath();
+    ctx.moveTo(cx + w - 1, cy);
+    ctx.lineTo(cx, cy + h - 1);
     ctx.stroke();
     ctx.restore();
   }
