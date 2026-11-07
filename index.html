@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#10131e" />
+  <meta name="description" content="AETHERIA — ein mobiles Fantasy-Action-RPG" />
+  <title>AETHERIA — Echoes of the Rift</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Marcellus&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="creation" class="screen creation-screen">
+      <div class="creation-art"><div class="moon"></div><div class="art-mountain mountain-a"></div><div class="art-mountain mountain-b"></div><div class="art-sigil">✦</div></div>
+      <div class="creation-content">
+        <div class="eyebrow">DIE WELT ZWISCHEN DEN WELTEN</div>
+        <h1>AETHERIA</h1><p class="subtitle">ECHOES OF THE RIFT</p>
+        <div class="create-card">
+          <div class="step-label">DEIN SCHICKSAL BEGINNT</div>
+          <label class="field-label" for="hero-name">CHARAKTERNAME</label>
+          <input id="hero-name" maxlength="16" placeholder="Name deines Helden" autocomplete="off" />
+          <div class="field-label">GESCHLECHT</div>
+          <div class="segmented gender-options"><button class="choice active" data-gender="female">♀ <span>Weiblich</span></button><button class="choice" data-gender="male">♂ <span>Männlich</span></button></div>
+          <div class="field-label">WÄHLE DEINE FRAKTION</div>
+          <div class="faction-options"><button class="faction-card active" data-faction="Angels"><span class="faction-symbol angel">✧</span><strong>ANGELS</strong><small>Gnade & Licht</small></button><button class="faction-card demon" data-faction="Demons"><span class="faction-symbol">♆</span><strong>DEMONS</strong><small>Wille & Schatten</small></button></div>
+          <div class="field-label">WÄHLE DEINE KLASSE</div>
+          <div class="class-options">
+            <button class="class-card active" data-class="Warrior"><span class="class-icon">⚔</span><strong>Warrior</strong><small>Standhaft · Nahkampf</small></button>
+            <button class="class-card" data-class="Mage"><span class="class-icon">✧</span><strong>Mage</strong><small>Arkana · Fernkampf</small></button>
+            <button class="class-card" data-class="Assassin"><span class="class-icon">⌁</span><strong>Assassin</strong><small>Schnell · Kritisch</small></button>
+          </div>
+          <button id="begin-btn" class="primary-btn">ABENTEUER BEGINNEN <span>→</span></button>
+          <div class="save-note">✦ Dein Fortschritt wird auf diesem Gerät gespeichert</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="game" class="screen game-screen hidden">
+      <header class="topbar">
+        <button id="profile-open" class="profile-chip"><span id="avatar-icon" class="avatar-icon">⚔</span><span class="profile-copy"><strong id="hud-name">Hero</strong><small><span id="hud-class">WARRIOR</span> <i>·</i> LV <b id="hud-level">1</b></small></span><span class="profile-chevron">⌄</span></button>
+        <div class="top-actions"><button id="map-open" class="icon-btn" aria-label="Karte">⌖</button><button id="menu-open" class="icon-btn" aria-label="Menü">☰</button></div>
+      </header>
+      <div class="zone-strip"><span class="zone-pin">✦</span><span><b id="zone-name">WHISPERING GROVE</b><small id="zone-subtitle">Grenzland · Gebiet 1</small></span><span class="zone-right">WELTSTUFE <b id="world-tier">01</b></span></div>
+      <section class="battlefield" id="battlefield" aria-label="Kampfgebiet">
+        <canvas id="battle-canvas"></canvas>
+        <div class="battle-vignette"></div><div class="weather-glow"></div>
+        <div class="enemy-hud"><div class="enemy-top"><span id="enemy-type">WILD</span><span id="enemy-name">Riftling</span><span id="enemy-rank" class="rank-tag">NORMAL</span></div><div class="enemy-health"><span id="enemy-hp-fill"></span></div><div class="enemy-footer"><span id="enemy-hp-text">120 / 120</span><span id="enemy-level">LV 1</span></div></div>
+        <div id="combat-floats" class="combat-floats"></div>
+        <div id="toast" class="toast"></div>
+        <div class="player-hud"><div class="player-line"><span class="player-class-icon" id="player-class-icon">⚔</span><b id="player-hud-name">Hero</b><span class="player-level">LV <b id="player-level-small">1</b></span></div><div class="stat-bar hp-bar"><i>♥</i><span class="bar-track"><b id="player-hp-fill"></b></span><small id="player-hp-text">100/100</small></div><div class="stat-bar mp-bar"><i>✧</i><span class="bar-track"><b id="player-mp-fill"></b></span><small id="player-mp-text">50/50</small></div><div class="xp-track"><span id="xp-fill"></span></div></div>
+        <div class="wave-toast" id="wave-toast"><span>✦</span><strong>RIFT ENCOUNTER</strong><small>Ein Schatten regt sich …</small></div>
+      </section>
+      <div class="combat-log" id="combat-log"><span class="log-dot"></span><span id="log-text">Ein Riftling tritt aus dem Schleier.</span></div>
+      <section class="combat-controls">
+        <div class="joystick-wrap"><div id="joystick" class="joystick"><div class="joy-ring"></div><div id="joy-knob" class="joy-knob"><span>✦</span></div></div><small>BEWEGEN</small></div>
+        <div class="action-controls">
+          <div class="skill-row"><button class="skill-btn" data-skill="skill1"><span class="skill-symbol">✧</span><small id="skill1-label">SCHILD</small><i class="cooldown"></i></button><button class="skill-btn" data-skill="skill2"><span class="skill-symbol">◈</span><small id="skill2-label">STURM</small><i class="cooldown"></i></button><button id="dodge-btn" class="skill-btn dodge-btn"><span class="skill-symbol">➤</span><small>AUSWEICHEN</small><i class="cooldown"></i></button></div>
+          <button id="attack-btn" class="attack-btn"><span>⚔</span><b>ANGRIFF</b></button>
+        </div>
+      </section>
+      <nav class="bottom-nav"><button class="nav-item active" data-panel="world"><span>⌖</span><small>WELT</small></button><button class="nav-item" data-panel="character"><span>♙</span><small>HELD</small></button><button class="nav-item" data-panel="inventory"><span>▦</span><small>BEUTE</small><i id="loot-dot" class="nav-dot hidden"></i></button><button class="nav-item" data-panel="forge"><span>⚒</span><small>SCHMIEDE</small></button><button class="nav-item" data-panel="more"><span>◇</span><small>MEHR</small></button></nav>
+    </section>
+  </main>
+  <div id="panel-backdrop" class="panel-backdrop hidden"><section id="drawer" class="drawer"><div class="drawer-handle"></div><header class="drawer-header"><div><small id="drawer-kicker">AETHERIA</small><h2 id="drawer-title">Welt</h2></div><button id="panel-close" class="close-btn">×</button></header><div id="drawer-content" class="drawer-content"></div></section></div>
+  <script src="game.js"></script>
+</body>
+</html>
