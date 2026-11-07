@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101114" />
+  <title>Eternal Realms — The One Hero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" aria-label="Eternal Realms Start"><span class="brand-mark">✦</span><span class="brand-copy"><b>ETERNAL REALMS</b><small>THE ONE HERO</small></span></button>
+      <div class="top-meta"><div class="realm-chip"><span class="realm-dot"></span><span id="realm-name">Dämmerwald</span><i>⌄</i></div><div class="resource"><span class="resource-icon gold-icon">◈</span><span><small>GOLD</small><b id="gold-top">0</b></span><button class="plus" data-action="gold-info">+</button></div><div class="resource gem-resource"><span class="resource-icon gem-icon">◆</span><span><small>SEELENSPLITTER</small><b id="shards-top">0</b></span><button class="plus" data-action="shard-info">+</button></div><button class="avatar-mini" data-action="profile">A</button></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="nav-label">REISE</div>
+        <button class="nav-item active" data-tab="battle"><span>⚔</span><b>Abenteuer</b><em>●</em></button>
+        <button class="nav-item" data-tab="realms"><span>⌖</span><b>Königreiche</b></button>
+        <button class="nav-item" data-tab="dungeons"><span>♜</span><b>Dungeons</b><span class="nav-count">3</span></button>
+        <button class="nav-item" data-tab="tower"><span>♧</span><b>Endloser Turm</b></button>
+        <div class="nav-label progression-label">FORTSCHRITT</div>
+        <button class="nav-item" data-tab="character"><span>♙</span><b>Charakter</b></button>
+        <button class="nav-item" data-tab="skills"><span>✧</span><b>Fähigkeiten</b><span class="nav-alert">1</span></button>
+        <button class="nav-item" data-tab="equipment"><span>⬡</span><b>Ausrüstung</b></button>
+        <button class="nav-item" data-tab="quests"><span>☷</span><b>Tägliche Quests</b></button>
+        <div class="sidebar-bottom"><div class="daily-card"><div class="daily-top"><span>✦</span><small>TÄGLICHE BELOHNUNG</small></div><b>Dein Schicksal wartet.</b><button data-tab="quests">Quests ansehen <span>→</span></button></div><div class="season"><span class="season-icon">♜</span><span><small>SAISON 01</small><b>Der Erwachte Wald</b></span><span class="season-arrow">↗</span></div></div>
+      </aside>
+      <main class="main-content">
+        <section class="battle-view" id="battle-view">
+          <div class="main-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> KAPITEL I <span class="eyebrow-line"></span></div><h1>Der Dämmerwald</h1><p>Ein uralter Wald erwacht zu neuem Leben.</p></div><button class="icon-button" data-action="settings" title="Einstellungen">⚙</button></div>
+          <div class="stage-row"><div class="stage-pill"><span class="stage-symbol">⌖</span><span>GEBIET <b id="stage-number">01</b></span></div><div class="progress-copy"><span id="stage-kills">0 / 10 Gegner</span><div class="stage-track"><i id="stage-progress"></i></div></div><button class="stage-skip" data-action="skip">Überspringen <span>»</span></button></div>
+          <div class="battle-scene" id="battle-scene">
+            <div class="scene-stars"></div><div class="moon"></div><div class="mountains back"></div><div class="mountains front"></div><div class="forest forest-back"></div><div class="forest forest-front"></div><div class="ground-glow"></div>
+            <div class="scene-vignette"></div><div class="scene-label"><span class="live-dot"></span> <span id="scene-location">DÄMMERWALD · LICHTUNG DER VERLORENEN</span></div>
+            <div class="scene-boss" id="boss-banner"><span>⚠</span> ELITEGEGNER</div>
+            <div class="character-wrap" id="hero-click" role="button" tabindex="0" aria-label="Angreifen"><div class="hero-aura"></div><div class="hero-sprite" id="hero-sprite"><div class="cape"></div><div class="leg leg-left"></div><div class="leg leg-right"></div><div class="body-armor"><i class="armor-glow"></i><i class="belt"></i></div><div class="arm arm-left"></div><div class="arm arm-right"><i class="sword"></i></div><div class="neck"></div><div class="head"><i class="hair"></i><i class="face"></i><i class="helm"></i></div><div class="hero-shadow"></div></div><div class="hero-nameplate"><b>ARIN</b><span>DER EWIGE</span></div></div>
+            <div class="enemy-wrap" id="enemy-click"><div class="enemy-glow"></div><div class="enemy-sprite" id="enemy-sprite"><div class="enemy-shadow"></div><div class="enemy-horns"></div><div class="enemy-body"><div class="enemy-eye eye-left"></div><div class="enemy-eye eye-right"></div><div class="enemy-mouth"></div><div class="enemy-mark"></div></div><div class="enemy-arm left"></div><div class="enemy-arm right"></div><div class="enemy-leg left"></div><div class="enemy-leg right"></div></div><div class="enemy-nameplate"><b id="enemy-name">Waldschrat</b><span id="enemy-level">STUFE 1</span></div></div>
+            <div class="hit-layer" id="hit-layer"></div><div class="scene-bottom"><span><i class="tiny-cross">✦</i> Einziger Held. Unendliche Möglichkeiten.</span><button id="auto-toggle" class="auto-toggle"><span class="auto-icon">⟳</span> AUTO <b>AN</b></button></div>
+            <button class="tap-hint" id="tap-hint">TIPPE ZUM ANGREIFEN <span>✦</span></button>
+          </div>
+          <div class="combat-stats"><div class="combat-stat"><span class="stat-icon damage-icon">⚔</span><span><small>SCHADEN / SEK.</small><b id="dps-value">1</b></span></div><div class="stat-divider"></div><div class="combat-stat"><span class="stat-icon crit-icon">✹</span><span><small>KRIT. CHANCE</small><b id="crit-value">5%</b></span></div><div class="stat-divider"></div><div class="combat-stat"><span class="stat-icon bonus-icon">◉</span><span><small>GOLDBONUS</small><b id="gold-bonus">+0%</b></span></div><div class="stat-spacer"></div><button class="skill-cast" id="skill-cast"><span class="skill-glyph">ϟ</span><span><small>FÄHIGKEIT</small><b>ARKANER SCHLAG</b></span><kbd>Q</kbd><i class="cooldown" id="skill-cooldown"></i></button></div>
+          <div class="battle-lower"><div class="section-title"><span>✧</span> HELDENAUSRÜSTUNG <small>DEIN WEG. DEINE LEGENDE.</small><button data-tab="equipment">ALLE ANSEHEN <b>→</b></button></div><div class="gear-row" id="gear-row"></div><div class="upgrade-strip"><div class="upgrade-title"><span class="upgrade-emblem">↑</span><span><b>MEISTERUNG</b><small>Werde mit jedem Schlag stärker.</small></span></div><div class="upgrade-cards" id="upgrade-cards"></div></div></div>
+        </section>
+        <section class="subpage hidden" id="subpage"><div class="main-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> ETERNAL REALMS <span class="eyebrow-line"></span></div><h1 id="subpage-title">Charakter</h1><p id="subpage-subtitle">Ein Held. Eine Legende. Für immer.</p></div><button class="icon-button" data-tab="battle">✕</button></div><div id="subpage-content"></div></section>
+      </main>
+      <aside class="right-rail">
+        <div class="hero-panel-head"><div><small>DEIN HELD</small><h2>Arin <span>✦</span></h2></div><button class="more-button" data-tab="character">···</button></div>
+        <div class="hero-level-card"><div class="level-seal"><span>LVL</span><b id="hero-level">1</b></div><div class="level-details"><div class="level-line"><span>ERFAHRUNG</span><b id="xp-label">0 / 100</b></div><div class="xp-track"><i id="xp-progress"></i></div><small><span id="xp-percent">0%</span> bis Stufe <span id="next-level">2</span></small></div></div>
+        <div class="hero-portrait"><div class="portrait-halo"></div><div class="portrait-figure"><div class="portrait-cape"></div><div class="portrait-body"></div><div class="portrait-head"></div><div class="portrait-hair"></div><div class="portrait-sword"></div></div><span class="portrait-caption">DER EWIGE WANDERER</span><button class="portrait-edit" data-action="skin">✧</button></div>
+        <div class="power-row"><span>KAMPFKRAFT</span><b><i>✦</i> <span id="power-value">10</span></b></div>
+        <div class="attributes"><div class="attribute-head"><b>ATTRIBUTE</b><button data-tab="character">DETAILS <span>→</span></button></div><div class="attribute-grid"><div><i class="attr-str">✹</i><span>STÄRKE</span><b id="str-value">5</b></div><div><i class="attr-vit">♥</i><span>VITALITÄT</span><b id="vit-value">5</b></div><div><i class="attr-dex">➶</i><span>GESCHICK</span><b id="dex-value">5</b></div><div><i class="attr-int">✧</i><span>INTELLIGENZ</span><b id="int-value">5</b></div><div><i class="attr-luk">☘</i><span>GLÜCK</span><b id="luk-value">5</b></div></div></div>
+        <div class="prestige-card"><div class="prestige-top"><span class="prestige-icon">♜</span><div><small>WIEDERGEBURT</small><b>Das Vermächtnis</b></div><span class="locked-tag">GESPERRT</span></div><p>Beginne von Neuem – und werde unaufhaltsam.</p><div class="prestige-progress"><i></i></div><small>Erreiche Gebiet 25 zum Freischalten</small></div>
+        <div class="rail-footer"><span class="online-dot"></span> SPEICHER AKTIV <span class="version">v0.1.0</span></div>
+      </aside>
+    </div>
+    <div class="toast" id="toast" aria-live="polite"></div>
+    <div class="modal-backdrop hidden" id="modal"><div class="modal-card"><button class="modal-close" data-action="close-modal">×</button><div id="modal-content"></div></div></div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
