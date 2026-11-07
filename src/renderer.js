@@ -199,6 +199,12 @@ export class Renderer {
       ctx.fillStyle = base;
       ctx.fill();
       // depth shading toward the centre of lakes
+      // Fine broken highlights suggest reflected sky while retaining the crisp pixel surface.
+      ctx.fillStyle = 'rgba(221,241,255,0.16)';
+      const glintX = cx + ((t.variant * 17) % 13) - 6;
+      const glintY = cy + ((t.variant * 11) % 7) - 3;
+      ctx.fillRect(glintX, glintY, 5 + (t.variant % 4), 1);
+      if (t.variant % 3 === 0) ctx.fillRect(glintX + 2, glintY - 1, 3, 1);
       if (deep) {
         ctx.fillStyle = 'rgba(4,12,26,0.18)';
         ctx.beginPath();
@@ -252,6 +258,16 @@ export class Renderer {
       ctx.fillStyle = 'rgba(240,236,210,0.28)';
       ctx.fillRect(cx - 4, cy - 2, 8, 1);
     }
+
+    // These two triangles sit fully inside the tile, so no per-tile canvas clip is needed.
+    ctx.fillStyle = 'rgba(255,244,218,0.055)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - h); ctx.lineTo(cx, cy); ctx.lineTo(cx - w, cy); ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(10,8,18,0.075)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy); ctx.lineTo(cx + w, cy); ctx.lineTo(cx, cy + h); ctx.closePath();
+    ctx.fill();
 
     // texture specks inside the diamond
     const rngV = (t.variant * 9301 + 49297) % 233280;

@@ -90,6 +90,11 @@ export function drawCharacter(ctx, o) {
   // front leg
   p(ctx, 1, -14, 4, 10 - legSwing, pantsColor);
   p(ctx, 1, -4 - legSwing, 5, 4, bootColor);
+  // Small leather/metal highlights keep the feet readable at mobile scale.
+  p(ctx, -5, -4 + legSwing, 2, 1, shade(bootColor, 0.22));
+  p(ctx, 2, -4 - legSwing, 2, 1, shade(bootColor, 0.22));
+  p(ctx, -4, -12 + legSwing, 1, 4, shade(pantsColor, 0.12));
+  p(ctx, 2, -12 - legSwing, 1, 4, shade(pantsColor, 0.12));
 
   if (o.classId === 'mage') {
     // robe skirt over legs
@@ -154,6 +159,25 @@ export function drawCharacter(ctx, o) {
     p(ctx, -2, -18, 4, 2, pal.trim);
   }
 
+  // Class-specific stitching and armor facets add depth without changing the silhouette.
+  if (o.classId === 'warrior') {
+    p(ctx, -6, -25, 2, 8, shade(chestPrimary, -0.12));
+    p(ctx, 4, -25, 2, 8, shade(chestPrimary, 0.18));
+    p(ctx, -1, -25, 2, 3, shade(pal.trim, 0.18));
+  } else if (o.classId === 'mage') {
+    p(ctx, -1, -26, 2, 3, shade(pal.trim, 0.2));
+    p(ctx, -2, -24, 4, 1, pal.trim);
+    p(ctx, -1, -23, 2, 2, shade(pal.trim, -0.12));
+    p(ctx, -6, -16, 2, 1, shade(pal.cloth, 0.18));
+    p(ctx, 4, -16, 2, 1, shade(pal.cloth, 0.18));
+  } else {
+    p(ctx, -6, -25, 1, 5, shade(pal.cloth, 0.2));
+    p(ctx, 5, -25, 1, 5, shade(pal.cloth, -0.12));
+    p(ctx, -3, -21, 6, 1, shade(pal.metal2, 0.18));
+    p(ctx, -4, -26, 1, 1, pal.trim);
+    p(ctx, 3, -26, 1, 1, pal.trim);
+  }
+
   // necklace / chain / earrings
   if (eq.necklace) {
     p(ctx, -3, -30, 6, 1, '#d9b45a');
@@ -178,6 +202,9 @@ export function drawCharacter(ctx, o) {
   p(ctx, 2, headY + 5, 2, 2, '#f7f4ea');
   p(ctx, -3, headY + 5, 1, 2, o.eyeColor || '#3f8cff');
   p(ctx, 3, headY + 5, 1, 2, o.eyeColor || '#3f8cff');
+  px(ctx, -4, headY + 5, '#fff8df');
+  px(ctx, 2, headY + 5, '#fff8df');
+  p(ctx, 0, headY + 7, 1, 1, shade(skin, -0.12));
   if (female) { p(ctx, -5, headY + 4, 2, 1, OUT2); p(ctx, 3, headY + 4, 2, 1, OUT2); }
   // mouth
   p(ctx, -1, headY + 9, 2, 1, shade(skin, -0.25));
@@ -643,6 +670,9 @@ export function drawEnemy(ctx, e, time) {
 
   switch (kind) {
     case 'slime': {
+      const squash = e.state === 'chase' ? Math.abs(run) : (Math.sin(time * 2.4 + (e.anim || 0)) + 1) * 0.5;
+      ctx.save();
+      ctx.scale(1 + squash * 0.09, 1 - squash * 0.07);
       p(ctx, -10, -10, 20, 10, C(dark));
       p(ctx, -9, -13, 18, 8, C(c));
       p(ctx, -6, -15, 12, 4, C(light));
@@ -650,6 +680,9 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, 3, -11, 3, 3, '#19221e');
       p(ctx, -1, -8, 3, 1, '#19221e');
       p(ctx, -7, -12, 2, 2, 'rgba(255,255,255,0.5)');
+      p(ctx, 5, -13, 2, 1, 'rgba(255,255,255,0.45)');
+      px(ctx, -2 + Math.round(Math.sin(time * 2 + (e.anim || 0))), -15, C(light));
+      ctx.restore();
       break;
     }
     case 'wolf': {
@@ -662,6 +695,9 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -3, -15, 2, 2, '#ffd166'); p(ctx, 1, -15, 2, 2, '#ffd166');
       p(ctx, -9, -4, 3, 4 + run, C(dark)); p(ctx, 2, -4, 3, 4 - run, C(dark));
       p(ctx, -2, -13, 3, 1, '#f7f0dc');
+      p(ctx, -7, -10, 2, 1, C(light)); p(ctx, -3, -9, 2, 1, C(light));
+      p(ctx, 5, -9, 2, 1, C(dark));
+      p(ctx, -8, -3 + Math.round(run), 2, 1, C(light));
       // tail
       p(ctx, 8, -15, 4, 2, C(dark)); p(ctx, 11, -18, 2, 4, C(dark));
       break;
@@ -713,8 +749,13 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -10, -12, 6, 12, rockD);
       p(ctx, 4, -12, 6, 12, rockD);
       p(ctx, -7, -38, 14, 8, rock);
-      p(ctx, -4, -35, 3, 3, '#ffb23e'); p(ctx, 2, -35, 3, 3, '#ffb23e');
+      const ember = '#ffb23e';
+      ctx.globalAlpha = 0.72 + Math.sin(time * 5 + (e.anim || 0)) * 0.22;
+      p(ctx, -4, -35, 3, 3, ember); p(ctx, 2, -35, 3, 3, ember);
+      ctx.globalAlpha = 1;
       p(ctx, -6, -26, 3, 3, C(light)); p(ctx, 5, -20, 3, 4, C(light));
+      p(ctx, -2, -28, 1, 4, C(rockD)); p(ctx, -1, -25, 3, 1, C(rockD));
+      p(ctx, 7, -29, 1, 3, C(rockD)); p(ctx, 6, -27, 2, 1, C(rockD));
       break;
     }
     case 'spider': {
@@ -748,6 +789,7 @@ export function drawEnemy(ctx, e, time) {
       p(ctx, -7, -33, 14, 7, C(light));
       p(ctx, -9, -30, 3, 8, C(dark)); p(ctx, 6, -30, 3, 8, C(dark));
       p(ctx, -5, -25, 3, 3, '#1a1a2a'); p(ctx, 2, -25, 3, 3, '#1a1a2a');
+      p(ctx, -4, -25, 1, 1, '#c6f4ff'); p(ctx, 3, -25, 1, 1, '#c6f4ff');
       p(ctx, -6, -15, 12, 10, C(c));
       p(ctx, -6, -6, 3, 4, 'rgba(180,220,255,0.35)');
       p(ctx, 0, -9, 3, 6, 'rgba(180,220,255,0.35)');
