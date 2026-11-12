@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#101114" />
+  <meta name="description" content="AETHERIA — a dark fantasy action RPG." />
+  <title>AETHERIA — Shards of the First Dawn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <button class="brand" data-screen="battle" aria-label="Aetheria home"><span class="brand-mark">✦</span><span>AETHERIA<small>SHARDS OF THE FIRST DAWN</small></span></button>
+      <div class="wallet"><span class="currency gold"><b>◈</b><span id="goldCount">0</span></span><span class="currency gems"><b>✧</b><span id="gemCount">0</span></span><button class="avatar-mini" id="profileButton">✦</button></div>
+    </header>
+    <section class="game-layout">
+      <aside class="sidebar">
+        <div class="player-card"><div class="player-crest" id="sidebarCrest">✦</div><div class="player-ident"><strong id="sidebarName">Wanderer</strong><span id="sidebarClass">WARRIOR · LV 1</span></div><div class="level-badge" id="sidebarLevel">01</div><div class="xp-track"><i id="sidebarXp"></i></div></div>
+        <div class="side-label">SANCTUARY</div>
+        <nav class="main-nav" aria-label="Game navigation">
+          <button class="nav-item active" data-screen="battle"><span>⚔</span>Battle<i>›</i></button>
+          <button class="nav-item" data-screen="world"><span>⌖</span>World map<i>›</i></button>
+          <button class="nav-item" data-screen="character"><span>♙</span>Character<i>›</i></button>
+          <button class="nav-item" data-screen="inventory"><span>▦</span>Inventory<i id="bagCount">0</i></button>
+          <button class="nav-item" data-screen="quests"><span>☷</span>Journal<i>›</i></button>
+          <button class="nav-item" data-screen="shop"><span>✧</span>Cosmetics<i>›</i></button>
+        </nav>
+        <div class="sidebar-bottom"><div class="online-note"><span class="status-dot"></span><div><b>LOCAL SAVE</b><small>Cloud account not connected</small></div></div><button class="text-button" id="saveButton">Save progress <span>↗</span></button></div>
+      </aside>
+      <section class="content-area">
+        <div class="mobile-heading"><button class="menu-toggle" id="menuToggle">☰</button><span>AETHERIA</span><button class="mobile-avatar" id="mobileProfile">✦</button></div>
+        <section class="screen active" id="screen-battle">
+          <div class="section-heading"><div><div class="eyebrow"><span class="live-dot"></span> THE VEIL IS THINNING</div><h1>Battle <span class="heading-dash">/</span> <em id="regionHeading">Greendale</em></h1></div><button class="round-button" id="soundButton" aria-label="Toggle sound">♫</button></div>
+          <div class="battle-stage" id="battleStage">
+            <div class="stage-sky"></div><div class="moon-halo"></div><div class="moon"></div>
+            <div class="distant-mountains"></div><div class="pine pine-a"></div><div class="pine pine-b"></div><div class="pine pine-c"></div><div class="ground-mist"></div>
+            <div class="stage-caption"><span class="location-pin">⌖</span><span id="regionCaption">THE OLD GLADE</span><span class="caption-line"></span><span id="encounterCount">ENCOUNTER 01</span></div>
+            <div class="combatant hero-combatant" id="heroFigure"><div class="hero-aura"></div><div class="hero-shadow"></div><svg class="hero-art" viewBox="0 0 170 260" aria-label="Your hero"><defs><linearGradient id="cape" x1="0" x2="1"><stop stop-color="#191927"/><stop offset=".5" stop-color="#603d5c"/><stop offset="1" stop-color="#241d32"/></linearGradient><linearGradient id="armor" x1="0" x2="1"><stop stop-color="#d4c2a1"/><stop offset=".5" stop-color="#5e6572"/><stop offset="1" stop-color="#252b39"/></linearGradient><linearGradient id="blade" x1="0" x2="1"><stop stop-color="#f9ebc8"/><stop offset=".55" stop-color="#a9d8db"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><ellipse cx="85" cy="246" rx="41" ry="8" fill="#030407" opacity=".55"/><path class="cape-shape" d="M59 85 Q38 98 39 138 L26 219 Q53 234 76 212 L82 132Z" fill="url(#cape)" stroke="#9b6685" stroke-opacity=".5"/><path d="M75 110 L54 226 L107 226 L99 112Z" fill="url(#armor)" stroke="#c2b9a2" stroke-opacity=".55"/><path d="M66 125 L88 126 L83 178 L65 165Z" fill="#251f2d"/><path d="M78 72 Q57 76 58 99 L70 122 L99 118 L107 92 L96 73Z" fill="#b7927b"/><path d="M56 77 Q55 48 82 48 Q109 49 106 81 L97 72 L93 64 L80 70 L67 64Z" fill="#211b28" stroke="#baa084" stroke-width="2"/><path d="M76 87 L87 87" stroke="#e8b8a5" stroke-width="2"/><path d="M66 105 L84 116 L101 103" fill="none" stroke="#e0c895" stroke-width="4"/><path d="M59 108 L34 161 L49 169 L75 125Z" fill="#737584" stroke="#c1b292"/><path d="M101 107 L120 154 L108 161 L91 123Z" fill="#565d6c" stroke="#bcb091"/><path class="weapon" d="M121 145 L148 63 L155 59 L147 151 L137 169Z" fill="url(#blade)" stroke="#deefe9"/><path d="M116 154 L146 145 M124 149 L139 161" stroke="#b88c57" stroke-width="4"/><path d="M57 217 L81 219 L76 241 L44 242Z M82 219 L107 217 L125 240 L92 242Z" fill="#252635" stroke="#9b8c76"/><circle cx="84" cy="104" r="4" fill="#e6bb76"/></svg><div class="figure-label"><b id="heroNameLabel">Wanderer</b><small id="heroClassLabel">THE OATHBOUND</small></div></div>
+            <div class="combatant enemy-combatant" id="enemyFigure"><div class="enemy-glow"></div><div class="enemy-shadow"></div><svg class="enemy-art" id="enemyArt" viewBox="0 0 190 210" aria-label="Enemy"><defs><linearGradient id="beast" x1="0" x2="1"><stop stop-color="#243e34"/><stop offset=".55" stop-color="#58785b"/><stop offset="1" stop-color="#172b28"/></linearGradient></defs><ellipse cx="98" cy="199" rx="64" ry="8" fill="#030407" opacity=".55"/><path d="M43 120 Q27 89 47 67 L61 41 L75 63 Q95 51 115 63 L138 42 L137 78 Q163 95 150 136 L168 176 L140 187 L123 151 L100 164 L72 151 L52 181 L30 172Z" fill="url(#beast)" stroke="#9bb78c" stroke-opacity=".55" stroke-width="2"/><path d="M58 91 Q79 77 94 97 L81 119 L55 115Z M112 94 Q132 75 147 91 L139 117 L113 119Z" fill="#1b2925"/><path d="M65 98 L79 100 M122 99 L136 96" stroke="#f3bb6e" stroke-width="5" stroke-linecap="round"/><path d="M86 134 Q101 143 119 130" fill="none" stroke="#d7a38b" stroke-width="4"/><path d="M46 69 L29 45 L58 55 M129 66 L156 37 L142 77" fill="#516c4e" stroke="#a0b38b" stroke-width="3"/><path d="M69 146 L71 185 M121 147 L120 184" stroke="#24372f" stroke-width="9" stroke-linecap="round"/></svg><div class="figure-label enemy-label"><b id="enemyNameLabel">Grove Stalker</b><small id="enemyTypeLabel">WILD · BEAST</small></div></div>
+            <div class="hit-flash" id="hitFlash"></div><div class="damage-layer" id="damageLayer"></div><div class="stage-vignette"></div>
+            <div class="enemy-hud"><div class="enemy-topline"><span id="enemyKind">WILD BEAST</span><span id="enemyLevel">LV. 1</span></div><div class="health-track enemy-health"><i id="enemyHealthBar"></i></div><div class="health-meta"><b id="enemyHpText">120 / 120</b><span id="enemyHpPercent">100%</span></div></div>
+            <div class="hero-hud"><div class="hero-hud-top"><span><b id="battleHeroName">Wanderer</b><small id="battleHeroClass">LV 1 · WARRIOR</small></span><span class="hp-number" id="heroHpText">180 / 180</span></div><div class="health-track hero-health"><i id="heroHealthBar"></i></div><div class="resource-track"><i id="manaBar"></i></div><div class="resource-label"><span>VITALITY</span><span id="manaText">MANA 60 / 60</span></div></div>
+          </div>
+          <div class="battle-info"><div class="enemy-intro"><span class="beast-icon">♧</span><div><strong id="enemyIntroName">Grove Stalker</strong><small id="enemyIntroDesc">A hungry thing beneath the boughs</small></div></div><div class="reward-preview"><span>VICTORY REWARDS</span><b>✦ <span id="xpPreview">18</span> XP <i>·</i> ◈ <span id="goldPreview">12</span></b></div></div>
+          <div class="combat-controls"><div class="skill-row"><button class="skill-button" id="skillOne"><span class="skill-icon">✧</span><span><b id="skillOneName">Arcane Slash</b><small id="skillOneMeta">12 MANA · 2× DMG</small></span><i class="skill-key">I</i></button><button class="skill-button" id="skillTwo"><span class="skill-icon violet">☄</span><span><b id="skillTwoName">Aether Burst</b><small id="skillTwoMeta">20 MANA · 3× DMG</small></span><i class="skill-key">II</i></button></div><div class="action-row"><button class="attack-button" id="attackButton"><span class="sword-icon">⚔</span><span><b>STRIKE</b><small>Tap to attack</small></span><span class="attack-chevron">›</span></button><button class="potion-button" id="potionButton"><span>✚</span><b>POTION</b><small id="potionCount">× 2</small></button></div><button class="continue-button hidden" id="continueButton">CLAIM VICTORY &amp; CONTINUE <span>→</span></button></div>
+          <div class="battle-footnote"><span>✦</span> Your actions alone shape the battle. No auto-combat.</div>
+        </section>
+        <section class="screen" id="screen-world"></section>
+        <section class="screen" id="screen-character"></section>
+        <section class="screen" id="screen-inventory"></section>
+        <section class="screen" id="screen-quests"></section>
+        <section class="screen" id="screen-shop"></section>
+      </section>
+      <aside class="right-rail"><div class="rail-title">FIELD NOTES <span>✧</span></div><div class="rail-quest"><div class="quest-icon">⚔</div><div><small>ACTIVE QUEST</small><b id="questTitle">The Glade Stirs</b><p id="questText">Defeat 3 creatures in Greendale.</p></div><div class="quest-progress"><i id="questProgress"></i></div><span class="quest-count" id="questCount">0 / 3</span></div><div class="rail-divider"></div><div class="rail-title">YOUR GEAR <button data-screen="inventory">VIEW ALL ↗</button></div><div class="gear-preview" id="gearPreview"></div><div class="rail-tip"><span>❝</span><p id="tipText">Every legend begins with a single, deliberate strike.</p></div></aside>
+    </section>
+    <nav class="bottom-nav" aria-label="Mobile navigation"><button class="active" data-screen="battle"><span>⚔</span><small>Battle</small></button><button data-screen="world"><span>⌖</span><small>World</small></button><button data-screen="character"><span>♙</span><small>Hero</small></button><button data-screen="inventory"><span>▦</span><small>Bag</small></button><button data-screen="shop"><span>✧</span><small>Shop</small></button></nav>
+  </main>
+  <div class="toast" id="toast" role="status"></div>
+  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" id="modalContent"></div></div>
+  <script src="game.js"></script>
+</body>
+</html>
