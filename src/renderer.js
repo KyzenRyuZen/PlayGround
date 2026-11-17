@@ -17,7 +17,7 @@ export class Renderer {
     this.ctx = canvas.getContext('2d', { alpha: false });
     this.game = game;
     this.world = null;
-    this.ground = null;
+    this.chunkCache = new Map();
     this.cam = { x: 0, y: 0 };
     this.camTarget = { x: 0, y: 0 };
     this.dpr = 1;
@@ -66,7 +66,13 @@ export class Renderer {
     this.offsetY = 96;
     this.groundW = size * TW + 192;
     this.groundH = size * TH + 192;
-    this.ground = this.buildGround(world);
+    // ground is pre-rendered in small chunks with an LRU cache, so map size
+    // no longer scales canvas memory (one huge bitmap would not fit mobile)
+    this.chunkSize = 20;
+    this.chunksX = Math.ceil(size / this.chunkSize);
+    this.chunksY = Math.ceil(size / this.chunkSize);
+    this.chunkCache.clear();
+    this._minimapCache = null;
     this.waterTiles = [];
     for (const t of world.tiles) if (t.type === 'water') this.waterTiles.push(t);
     this.makeWeather(world.region.weather);
@@ -127,40 +133,76 @@ export class Renderer {
   }
 
   // ------------------------------------------------------------
-  // GROUND PRE-RENDER
+  // GROUND PRE-RENDER (chunked, LRU-cached)
   // ------------------------------------------------------------
-  buildGround(world) {
+  chunkBox(cx, cy) {
+    const N = this.chunkSize;
+    const x0 = cx * N, y0 = cy * N;
+    // diamond bounding box of the N×N tile block in world pixels
+    const ox = this.offsetX + (x0 - (y0 + N - 1)) * TW / 2 - TW / 2;
+    const oy = this.offsetY + (x0 + y0) * TH / 2 - TH / 2;
+    return { ox, oy, w: N * TW, h: N * TH };
+  }
+
+  buildChunk(world, cx, cy) {
+    const N = this.chunkSize;
     const c = document.createElement('canvas');
-    c.width = this.groundW;
-    c.height = this.groundH;
+    c.width = N * TW;
+    c.height = N * TH;
     const ctx = c.getContext('2d');
     ctx.imageSmoothingEnabled = false;
     const pal = world.region.palette;
-
-    const g = ctx.createLinearGradient(0, 0, 0, this.groundH);
-    g.addColorStop(0, shade(pal.sky, 0.04));
-    g.addColorStop(1, shade(pal.sky, -0.1));
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, c.width, c.height);
-
-    for (let y = 0; y < world.size; y++) {
-      for (let x = 0; x < world.size; x++) {
+    const { ox, oy } = this.chunkBox(cx, cy);
+    // draw a 2-tile border so neighbour diamonds are not clipped at seams
+    const M = 2;
+    const x0 = cx * N, y0 = cy * N;
+    for (let y = Math.max(0, y0 - M); y < Math.min(world.size, y0 + N + M); y++) {
+      for (let x = Math.max(0, x0 - M); x < Math.min(world.size, x0 + N + M); x++) {
         const t = world.tiles[y * world.size + x];
-        const cx = this.offsetX + (x - y) * TW / 2;
-        const cy = this.offsetY + (x + y) * TH / 2;
-        this.drawTile(ctx, t, cx, cy, pal, x, y, world);
+        const px = this.offsetX + (x - y) * TW / 2 - ox;
+        const py = this.offsetY + (x + y) * TH / 2 - oy;
+        this.drawTile(ctx, t, px, py, pal, x, y, world);
       }
     }
-
-    // subtle map border fade
-    ctx.save();
-    const edge = ctx.createLinearGradient(0, 0, 0, 160);
-    edge.addColorStop(0, 'rgba(3,4,8,0.6)');
-    edge.addColorStop(1, 'rgba(3,4,8,0)');
-    ctx.fillStyle = edge;
-    ctx.fillRect(0, 0, c.width, 160);
-    ctx.restore();
     return c;
+  }
+
+  getChunk(world, cx, cy) {
+    const key = cy * this.chunksX + cx;
+    const cached = this.chunkCache.get(key);
+    if (cached) {
+      this.chunkCache.delete(key);
+      this.chunkCache.set(key, cached);
+      return cached;
+    }
+    const chunk = this.buildChunk(world, cx, cy);
+    this.chunkCache.set(key, chunk);
+    while (this.chunkCache.size > 26) this.chunkCache.delete(this.chunkCache.keys().next().value);
+    return chunk;
+  }
+
+  drawGroundChunks(ctx, vw, vh) {
+    const world = this.world;
+    if (!world) return;
+    const left = this.cam.x, top = this.cam.y;
+    const right = left + vw, bottom = top + vh;
+    const missing = [];
+    for (let cy = 0; cy < this.chunksY; cy++) {
+      for (let cx = 0; cx < this.chunksX; cx++) {
+        const { ox, oy, w, h } = this.chunkBox(cx, cy);
+        if (ox + w < left || ox > right || oy + h < top || oy > bottom) continue;
+        const chunk = this.chunkCache.get(cy * this.chunksX + cx);
+        if (chunk) ctx.drawImage(chunk, Math.round(ox - left), Math.round(oy - top));
+        else missing.push([cx, cy, ox + w / 2, oy + h / 2]);
+      }
+    }
+    // build missing chunks closest to the view first (small budget per frame)
+    missing.sort((a, b) => (Math.hypot(a[2] - left - vw / 2, a[3] - top - vh / 2) - Math.hypot(b[2] - left - vw / 2, b[3] - top - vh / 2)));
+    for (let i = 0; i < Math.min(3, missing.length); i++) {
+      const [cx, cy] = missing[i];
+      const { ox, oy } = this.chunkBox(cx, cy);
+      ctx.drawImage(this.getChunk(world, cx, cy), Math.round(ox - left), Math.round(oy - top));
+    }
   }
 
   drawTile(ctx, t, cx, cy, pal, tx, ty, world) {
@@ -523,7 +565,7 @@ export class Renderer {
     // ground is the only pre-rendered bitmap — smooth its downscale so the pixel art stays clean
     ctx.imageSmoothingEnabled = true;
     if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(this.ground, -Math.round(this.cam.x), -Math.round(this.cam.y));
+    this.drawGroundChunks(ctx, vw, vh);
     ctx.imageSmoothingEnabled = false;
 
     this.drawWaterFX(ctx);
@@ -1263,14 +1305,15 @@ export class Renderer {
   // ------------------------------------------------------------
   // MINIMAP
   // ------------------------------------------------------------
-  drawMinimap(canvas, game) {
-    const ctx = canvas.getContext('2d');
-    const world = this.world;
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
+  minimapBase(w, h, world) {
+    const cache = this._minimapCache;
+    if (cache && cache.w === w && cache.h === h && cache.world === world) return cache.canvas;
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext('2d');
     ctx.fillStyle = 'rgba(8,7,14,0.88)';
     ctx.fillRect(0, 0, w, h);
-    if (!world) return;
     const pad = 4;
     const scale = Math.min((w - pad * 2) / world.size, (h - pad * 2) / world.size);
     const ox = (w - world.size * scale) / 2;
@@ -1288,6 +1331,23 @@ export class Renderer {
         ctx.fillRect(ox + x * scale, oy + y * scale, Math.ceil(scale), Math.ceil(scale));
       }
     }
+    this._minimapCache = { w, h, world, canvas: c, scale, ox, oy };
+    return c;
+  }
+
+  drawMinimap(canvas, game) {
+    const ctx = canvas.getContext('2d');
+    const world = this.world;
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (!world) {
+      ctx.fillStyle = 'rgba(8,7,14,0.88)';
+      ctx.fillRect(0, 0, w, h);
+      return;
+    }
+    const base = this.minimapBase(w, h, world);
+    ctx.drawImage(base, 0, 0);
+    const { scale, ox, oy } = this._minimapCache;
     // npcs
     for (const n of world.npcs) {
       ctx.fillStyle = '#ffd166';
