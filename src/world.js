@@ -174,7 +174,7 @@ function placeLair(world, region, rng) {
 
 function makeNodes(world, region, rng) {
   const nodes = [];
-  const count = Math.max(8, Math.round(world.size * 0.28));
+  const count = Math.max(8, Math.round(world.size * 0.35));
   for (let i = 0; i < count; i++) {
     let x, y, tries = 0;
     do {
@@ -192,8 +192,10 @@ function makeNodes(world, region, rng) {
 }
 
 function makeHidden(world, region, rng) {
+  const s = world.size;
   const spots = [
-    [3.2, world.size - 3.6], [world.size - 3.4, 3.2]
+    [3.2, s - 3.6], [s - 3.4, 3.2], [s - 3.4, s - 3.6], [3.2, 3.2],
+    [s / 2, 3.0], [s / 2, s - 3.0]
   ];
   return spots.map(([x, y], i) => ({
     hid: uid('hidden'), x, y, opened: false, kind: 'chest',
@@ -229,13 +231,14 @@ export function buildWorld(regionId, opts = {}) {
     }
   }
 
-  // water features
+  // water features (positions are fractions of the map, so they scale with region size)
   const pond = {
-    greendale: [26, 7, 3.3], ironcrag: [7, 26, 2.6], venomwood: [27, 6, 3.6], mistgrave: [7, 27, 3.2],
-    frostpeak: [27, 7, 3.4], sunscorch: [7, 28, 2.8], ashen: [28, 7, 3.1], tower: [7, 7, 2.6]
+    greendale: [0.464, 0.125, 3.3], ironcrag: [0.135, 0.5, 2.6], venomwood: [0.482, 0.107, 3.6], mistgrave: [0.12, 0.466, 3.2],
+    frostpeak: [0.466, 0.117, 3.4], sunscorch: [0.113, 0.452, 2.8], ashen: [0.438, 0.109, 3.1], tower: [0.12, 0.12, 2.6]
   }[regionId];
   if (pond) {
-    const [px, py, r] = pond;
+    const [fx, fy, baseR] = pond;
+    const px = size * fx, py = size * fy, r = baseR * Math.sqrt(size / 56);
     for (let y = Math.floor(py - r - 1); y <= Math.ceil(py + r + 1); y++) {
       for (let x = Math.floor(px - r - 1); x <= Math.ceil(px + r + 1); x++) {
         if (!inBounds(world, x, y)) continue;
@@ -282,7 +285,7 @@ export function buildWorld(regionId, opts = {}) {
   placeLair(world, region, rng);
 
   // random scenery
-  const propCount = Math.floor(size * 2.4);
+  const propCount = Math.floor(size * 2.8);
   for (let i = 0; i < propCount * 3 && world.props.length < propCount; i++) {
     const type = rng.pick(region.props);
     const x = 1.4 + rng.next() * (size - 2.8);
@@ -423,7 +426,8 @@ export function populateEnemies(world, opts = {}) {
   const enemies = [];
   const dungeon = world.dungeon;
   if (dungeon) {
-    for (let i = 0; i < 16; i++) {
+    const minions = Math.min(30, Math.max(16, Math.round(world.size * 0.18)));
+    for (let i = 0; i < minions; i++) {
       const type = rng.pick(dungeon.minions);
       const spot = safeSpot(world, rng, 2, 2.5);
       const e = createEnemy(world, type, spot.x, spot.y, { elite: rng.chance(0.18), level: dungeon.level });
@@ -432,7 +436,7 @@ export function populateEnemies(world, opts = {}) {
     const boss = createEnemy(world, dungeon.boss, world.lair[0] - 1.2, world.lair[1] - 1.2, { level: dungeon.level + 2, scale: 1.18 });
     if (boss) enemies.push(boss);
   } else {
-    const normals = 15;
+    const normals = Math.min(48, Math.max(15, Math.round(world.size * 0.32)));
     for (let i = 0; i < normals; i++) {
       const type = rng.pick(world.region.monsters);
       const spot = safeSpot(world, rng);
