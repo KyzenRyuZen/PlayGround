@@ -174,7 +174,7 @@ function placeLair(world, region, rng) {
 
 function makeNodes(world, region, rng) {
   const nodes = [];
-  const count = 8;
+  const count = Math.min(20, Math.round(8 * (world.size / 34)));
   for (let i = 0; i < count; i++) {
     let x, y, tries = 0;
     do {
@@ -204,15 +204,20 @@ function makeHidden(world, region, rng) {
 
 export function buildWorld(regionId, opts = {}) {
   const region = REGIONS[regionId] || REGIONS.greendale;
-  const size = region.size;
+  // Maps are generated as large as the engine comfortably allows; the region's
+  // own layout coordinates are proportionally rescaled so village, lair, spawn,
+  // lake and paths keep their designed relationships. Size 60 keeps the
+  // pre-rendered ground bitmap under the legacy 4096px canvas cap on iOS.
+  const size = 60;
+  const k = size / region.size;
   const rng = makeRng(`aetheria:${regionId}:${opts.dungeonId || 'open'}`);
   const dungeon = opts.dungeonId ? DUNGEONS.find(d => d.id === opts.dungeonId) : null;
   const world = {
     regionId, region, size, dungeon, mode: dungeon ? 'dungeon' : 'world',
     props: [], blockingProps: [], npcs: [], nodes: [], hidden: [], enemies: [],
     tiles: new Array(size * size),
-    village: [...region.village], lair: [...region.lair],
-    spawn: { x: region.spawn[0], y: region.spawn[1] },
+    village: region.village.map(v => v * k), lair: region.lair.map(v => v * k),
+    spawn: { x: region.spawn[0] * k, y: region.spawn[1] * k },
     bossId: region.boss, time: 0
   };
 
@@ -229,13 +234,14 @@ export function buildWorld(regionId, opts = {}) {
     }
   }
 
-  // water features
+  // water features (proportionally rescaled with the larger map)
   const pond = {
     greendale: [26, 7, 3.3], ironcrag: [7, 26, 2.6], venomwood: [27, 6, 3.6], mistgrave: [7, 27, 3.2],
     frostpeak: [27, 7, 3.4], sunscorch: [7, 28, 2.8], ashen: [28, 7, 3.1], tower: [7, 7, 2.6]
   }[regionId];
   if (pond) {
-    const [px, py, r] = pond;
+    const [px0, py0, r0] = pond;
+    const px = px0 * k, py = py0 * k, r = r0 * k * 0.8;
     for (let y = Math.floor(py - r - 1); y <= Math.ceil(py + r + 1); y++) {
       for (let x = Math.floor(px - r - 1); x <= Math.ceil(px + r + 1); x++) {
         if (!inBounds(world, x, y)) continue;
@@ -281,8 +287,8 @@ export function buildWorld(regionId, opts = {}) {
   placeVillage(world, region, rng);
   placeLair(world, region, rng);
 
-  // random scenery
-  const propCount = Math.floor(size * 2.4);
+  // random scenery — density kept per-area, so bigger maps get proportionally more props
+  const propCount = Math.floor(size * size / 34 * 2.4);
   for (let i = 0; i < propCount * 3 && world.props.length < propCount; i++) {
     const type = rng.pick(region.props);
     const x = 1.4 + rng.next() * (size - 2.8);
@@ -292,8 +298,8 @@ export function buildWorld(regionId, opts = {}) {
     tryPlaceProp(world, rng, type, x, y);
   }
 
-  // extra roadside details
-  for (let i = 0; i < 18; i++) {
+  // extra roadside details (scaled with map size)
+  for (let i = 0; i < Math.round(18 * k); i++) {
     const type = rng.pick(['flowers', 'bush', 'stump', 'rubble', 'bone', 'signpost'].filter(t => region.props.includes(t) || Math.random() < 0.3));
     if (!type) continue;
     const x = 1.5 + rng.next() * (size - 3);
@@ -423,7 +429,8 @@ export function populateEnemies(world, opts = {}) {
   const enemies = [];
   const dungeon = world.dungeon;
   if (dungeon) {
-    for (let i = 0; i < 16; i++) {
+    const k = world.size / world.region.size;
+    for (let i = 0; i < Math.min(44, Math.round(16 * k * k)); i++) {
       const type = rng.pick(dungeon.minions);
       const spot = safeSpot(world, rng, 2, 2.5);
       const e = createEnemy(world, type, spot.x, spot.y, { elite: rng.chance(0.18), level: dungeon.level });
@@ -432,7 +439,9 @@ export function populateEnemies(world, opts = {}) {
     const boss = createEnemy(world, dungeon.boss, world.lair[0] - 1.2, world.lair[1] - 1.2, { level: dungeon.level + 2, scale: 1.18 });
     if (boss) enemies.push(boss);
   } else {
-    const normals = 15;
+    // enemy count scales with area so monster density stays the same on bigger maps
+    const k = world.size / world.region.size;
+    const normals = Math.min(52, Math.round(15 * k * k));
     for (let i = 0; i < normals; i++) {
       const type = rng.pick(world.region.monsters);
       const spot = safeSpot(world, rng);

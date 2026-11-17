@@ -219,6 +219,9 @@ button { cursor: pointer; }
 .act-skill span { font-size: 23px; color: #b8d4ff; }
 .act-potion { right: 3px; bottom: 86px; width: 50px; height: 50px; }
 .act-potion span { font-size: 19px; }
+.act-mana { right: 122px; bottom: 78px; width: 42px; height: 42px; border-color: rgba(120,180,255,.4); background: radial-gradient(circle at 38% 30%, #26395e, #141830); }
+.act-mana span { font-size: 17px; color: #a8d8ff; }
+.act-mana i { color: #9ecbff; }
 .act-interact { right: 63px; bottom: 75px; width: 54px; height: 54px; border-color: rgba(140,255,190,.35); }
 .act-interact span { font-size: 20px; color: #b6ffce; }
 .act-mini { width: 42px; height: 42px; }
