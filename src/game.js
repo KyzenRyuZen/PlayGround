@@ -865,6 +865,10 @@ export class Game {
     const id = options.find(k => (c.consumables[k] || 0) > 0);
     if (!id) { Events.emit('toast', { msg: 'No mana potions. Visit the Potion Merchant.', type: 'warn' }); return; }
     const res = this.state.usePotion(id);
+    if (res.ok) {
+      this.sfx.play('loot');
+      this.addEffect({ type: 'burst', x: this.player.x, y: this.player.y, color: '#5aa9ff', life: 0.5, maxLife: 0.5 });
+    }
     Events.emit('toast', { msg: res.msg, type: res.ok ? 'success' : 'warn', small: true });
   }
 

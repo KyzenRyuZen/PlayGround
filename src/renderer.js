@@ -28,6 +28,9 @@ export class Renderer {
     this.setZoom();
     this.particles = [];
     this.dust = [];
+    this.critters = [];
+    this.birds = [];
+    this.clouds = [];
     this.waterTiles = [];
     this.minimapCanvas = null;
     this.lastMinimap = 0;
@@ -68,8 +71,28 @@ export class Renderer {
     this.groundH = size * TH + 192;
     this.ground = this.buildGround(world);
     this.waterTiles = [];
-    for (const t of world.tiles) if (t.type === 'water') this.waterTiles.push(t);
+    this.shoreWater = [];
+    for (const t of world.tiles) {
+      if (t.type !== 'water') continue;
+      this.waterTiles.push(t);
+      const size = world.size;
+      const isLand = (dx, dy) => {
+        const nx = t.x + dx, ny = t.y + dy;
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) return false;
+        const n = world.tiles[ny * size + nx];
+        return n && n.type !== 'water' && n.type !== 'void';
+      };
+      if (isLand(1, 0) || isLand(-1, 0) || isLand(0, 1) || isLand(0, -1)) this.shoreWater.push(t);
+    }
     this.makeWeather(world.region.weather);
+    this.makeCritters();
+    this.clouds = Array.from({ length: 3 }, (_, i) => ({
+      x: Math.random() * this.width,
+      y: Math.random() * this.height,
+      vx: 7 + Math.random() * 9,
+      r: 90 + Math.random() * 130,
+      squash: 0.32 + Math.random() * 0.1
+    }));
     this.snapped = false;
     if (opts.snap !== false) this.snapCamera(true);
     this.worldRef = world;
@@ -486,12 +509,134 @@ export class Renderer {
   }
 
   // ------------------------------------------------------------
+  // AMBIENT CRITTERS — butterflies / fireflies + passing birds
+  // ------------------------------------------------------------
+  makeCritters() {
+    const id = this.world.regionId;
+    const kind = ['greendale', 'sunscorch'].includes(id) ? 'butterfly'
+      : ['venomwood', 'mistgrave', 'tower', 'frostpeak'].includes(id) ? 'firefly' : 'none';
+    this.critterKind = kind;
+    this.critters = [];
+    if (kind === 'butterfly') {
+      const cols = ['#ffd166', '#ff8fa3', '#8fe2ff', '#f7f4ea'];
+      for (let i = 0; i < 5; i++) {
+        this.critters.push({
+          x: Math.random() * this.width,
+          y: Math.random() * this.height,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.7 + Math.random() * 0.9,
+          color: cols[i % cols.length],
+          size: 2 + Math.random() * 1.5
+        });
+      }
+    } else if (kind === 'firefly') {
+      const glow = id === 'tower' ? '#b5a8ff' : id === 'frostpeak' ? '#bfefff' : '#c9ffa0';
+      for (let i = 0; i < 7; i++) {
+        this.critters.push({
+          x: Math.random() * this.width,
+          y: Math.random() * this.height,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.5 + Math.random() * 0.8,
+          color: glow,
+          size: 1.5 + Math.random() * 1.5
+        });
+      }
+    }
+    this.birdTimer = 4 + Math.random() * 8;
+  }
+
+  updateCritters(dt) {
+    for (const c of this.critters) {
+      c.phase += dt * c.speed;
+      c.x += Math.cos(c.phase * 0.8) * (this.critterKind === 'firefly' ? 9 : 16) * dt;
+      c.y += Math.sin(c.phase * 1.3) * (this.critterKind === 'firefly' ? 6 : 11) * dt;
+      if (c.x < -10) c.x = this.width + 10;
+      if (c.x > this.width + 10) c.x = -10;
+      if (c.y < -10) c.y = this.height + 10;
+      if (c.y > this.height + 10) c.y = -10;
+    }
+    // occasional bird crossing the sky
+    this.birdTimer = (this.birdTimer ?? 10) - dt;
+    if (this.birdTimer <= 0) {
+      this.birdTimer = 12 + Math.random() * 16;
+      const dir = Math.random() < 0.5 ? 1 : -1;
+      this.birds.push({
+        x: dir > 0 ? -30 : this.width + 30,
+        y: this.height * (0.1 + Math.random() * 0.35),
+        vx: dir * (36 + Math.random() * 30),
+        vy: (Math.random() - 0.5) * 10,
+        phase: Math.random() * 6
+      });
+    }
+    for (const b of this.birds) {
+      b.phase += dt * 7;
+      b.x += b.vx * dt;
+      b.y += b.vy * dt;
+    }
+    this.birds = this.birds.filter(b => b.x > -60 && b.x < this.width + 60);
+  }
+
+  drawCritters(ctx) {
+    // butterflies: flapping pixel wings; fireflies: pulsing glow dots
+    for (const c of this.critters) {
+      if (this.critterKind === 'butterfly') {
+        const flap = Math.abs(Math.sin(c.phase * 9));
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = c.color;
+        ctx.fillRect(c.x - c.size, c.y - flap * c.size, c.size, Math.max(1, flap * c.size * 1.6));
+        ctx.fillRect(c.x + 1, c.y - flap * c.size, c.size, Math.max(1, flap * c.size * 1.6));
+        ctx.fillStyle = '#3a2c22';
+        ctx.fillRect(c.x, c.y - 1, 1, 2);
+      } else {
+        const pulse = 0.4 + Math.abs(Math.sin(c.phase * 2)) * 0.6;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = pulse * 0.75;
+        ctx.fillStyle = c.color;
+        ctx.fillRect(c.x, c.y, c.size, c.size);
+        ctx.globalAlpha = pulse * 0.25;
+        ctx.fillRect(c.x - 2, c.y - 2, c.size + 4, c.size + 4);
+        ctx.restore();
+      }
+    }
+    ctx.globalAlpha = 1;
+    // birds: little flapping 'v's
+    ctx.strokeStyle = 'rgba(20,16,26,0.55)';
+    ctx.lineWidth = 1.4;
+    for (const b of this.birds) {
+      const flap = Math.sin(b.phase) * 3;
+      ctx.beginPath();
+      ctx.moveTo(b.x - 4, b.y - flap);
+      ctx.lineTo(b.x, b.y);
+      ctx.lineTo(b.x + 4, b.y - flap);
+      ctx.stroke();
+    }
+  }
+
+  drawCloudShadows(ctx) {
+    ctx.save();
+    for (const c of this.clouds) {
+      ctx.globalAlpha = 0.055;
+      ctx.fillStyle = '#060a12';
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y, c.r, c.r * c.squash, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(c.x + c.r * 0.55, c.y + c.r * 0.16, c.r * 0.6, c.r * c.squash * 0.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------
   // MAIN RENDER
   // ------------------------------------------------------------
   render(game, dt) {
     const ctx = this.ctx;
     this.time += dt;
     this.updateWeather(dt);
+    this.updateCritters(dt);
+    for (const c of this.clouds) { c.x += c.vx * dt; if (c.x - c.r > this.width) c.x = -c.r * 1.6; }
     this.updateDust(dt);
     const world = this.world;
     if (!world || !game.player) return;
@@ -512,18 +657,29 @@ export class Renderer {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
     const pal = world.region.palette;
-    const bg = ctx.createLinearGradient(0, 0, 0, this.height);
-    bg.addColorStop(0, pal.sky);
-    bg.addColorStop(1, shade(pal.sky, -0.12));
-    ctx.fillStyle = bg;
+    if (!this._bgGrad || this._bgGradH !== this.height || this._bgGradRegion !== world.regionId) {
+      this._bgGradH = this.height;
+      this._bgGradRegion = world.regionId;
+      this._bgGrad = ctx.createLinearGradient(0, 0, 0, this.height);
+      this._bgGrad.addColorStop(0, pal.sky);
+      this._bgGrad.addColorStop(1, shade(pal.sky, -0.12));
+    }
+    ctx.fillStyle = this._bgGrad;
     ctx.fillRect(0, 0, this.width, this.height);
 
     // ---- world (zoomed slightly out to show more of the surrounding land) ----
     ctx.setTransform(this.dpr * z, 0, 0, this.dpr * z, 0, 0);
-    // ground is the only pre-rendered bitmap — smooth its downscale so the pixel art stays clean
+    // ground is the only pre-rendered bitmap — draw only the visible slice so the
+    // huge bitmap cost stays proportional to the viewport, not the map size
     ctx.imageSmoothingEnabled = true;
     if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(this.ground, -Math.round(this.cam.x), -Math.round(this.cam.y));
+    {
+      const camX = Math.round(this.cam.x), camY = Math.round(this.cam.y);
+      const sx = Math.max(0, camX - 64), sy = Math.max(0, camY - 64);
+      const sw = Math.min(this.ground.width - sx, Math.ceil(vw) + 160);
+      const sh = Math.min(this.ground.height - sy, Math.ceil(vh) + 160);
+      if (sw > 0 && sh > 0) ctx.drawImage(this.ground, sx, sy, sw, sh, sx - camX, sy - camY, sw, sh);
+    }
     ctx.imageSmoothingEnabled = false;
 
     this.drawWaterFX(ctx);
@@ -600,15 +756,22 @@ export class Renderer {
     // soft light shafts over the forests
     if (['greendale', 'venomwood', 'ironcrag'].includes(world.regionId)) this.drawSunShafts(ctx);
 
+    // drifting cloud shadows + ambient critters + birds
+    this.drawCloudShadows(ctx);
+    this.drawCritters(ctx);
+
     // weather
     this.drawWeather(ctx);
 
     // ambient fog / region tint
     ctx.save();
-    const fog = ctx.createRadialGradient(this.width / 2, this.height / 2, Math.min(this.width, this.height) * 0.2, this.width / 2, this.height / 2, Math.max(this.width, this.height) * 0.76);
-    fog.addColorStop(0, pal.fog);
-    fog.addColorStop(1, 'rgba(5,4,10,0.46)');
-    ctx.fillStyle = fog;
+    if (!this._fogGrad || this._fogW !== this.width || this._fogH !== this.height || this._fogRegion !== world.regionId) {
+      this._fogW = this.width; this._fogH = this.height; this._fogRegion = world.regionId;
+      this._fogGrad = ctx.createRadialGradient(this.width / 2, this.height / 2, Math.min(this.width, this.height) * 0.2, this.width / 2, this.height / 2, Math.max(this.width, this.height) * 0.76);
+      this._fogGrad.addColorStop(0, pal.fog);
+      this._fogGrad.addColorStop(1, 'rgba(5,4,10,0.46)');
+    }
+    ctx.fillStyle = this._fogGrad;
     ctx.fillRect(0, 0, this.width, this.height);
     ctx.restore();
 
@@ -699,12 +862,13 @@ export class Renderer {
   // ------------------------------------------------------------
   // OBJECT RENDERING
   // ------------------------------------------------------------
-  drawShadow(ctx, sx, sy, w, alpha = 0.28) {
+  drawShadow(ctx, sx, sy, w, alpha = 0.28, stretch = 0) {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = '#08060d';
+    // slightly elongated toward the south-east, more so for tall props
     ctx.beginPath();
-    ctx.ellipse(sx, sy + 2, w, w * 0.4, 0, 0, Math.PI * 2);
+    ctx.ellipse(sx + w * (0.12 + stretch * 0.22), sy + 2, w * (1 + stretch * 0.5), w * (0.4 - stretch * 0.06), 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
@@ -712,8 +876,9 @@ export class Renderer {
   drawPropSprite(ctx, prop, s) {
     const S = this.spriteScale() * (prop.scale || 1);
     const sc = this.spriteScale();
-    const shadowW = prop.type === 'house' ? 36 : prop.type === 'tent' ? 26 : prop.kind === 'tree' ? 20 : 12;
-    this.drawShadow(ctx, s.x, s.y, shadowW * sc * 0.55, prop.type === 'house' ? 0.35 : 0.22);
+    const tall = prop.type === 'house' || prop.kind === 'tree' || prop.kind === 'pine' || prop.kind === 'pine_snow' || prop.kind === 'palm';
+    const shadowW = prop.type === 'house' ? 36 : prop.kind === 'tent' ? 26 : tall ? 20 : 12;
+    this.drawShadow(ctx, s.x, s.y, shadowW * sc * 0.55, prop.type === 'house' ? 0.35 : 0.22, tall ? 1 : 0);
     ctx.save();
     ctx.translate(s.x, s.y);
     ctx.scale(S, S);
@@ -1073,6 +1238,19 @@ export class Renderer {
       if (tw <= 0.55) continue;
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(s.x + tw * 3, s.y - 1 - tw * 2, 2, 1);
+    }
+    // breathing foam along the shoreline
+    for (let i = 0; i < this.shoreWater.length; i++) {
+      const tile = this.shoreWater[i];
+      const s = this.worldToView(tile.x, tile.y);
+      if (s.x < -40 || s.x > this.viewW() + 40 || s.y < -20 || s.y > this.viewH() + 20) continue;
+      const pulse = Math.sin(t * 1.7 + i * 1.9);
+      ctx.globalAlpha = 0.22 + Math.max(0, pulse) * 0.22;
+      ctx.fillStyle = '#f2fbff';
+      const spread = 3 + pulse * 2.5;
+      ctx.fillRect(s.x - spread - 3, s.y + 1, 4, 1);
+      ctx.fillRect(s.x + spread, s.y + 2, 5, 1);
+      ctx.fillRect(s.x - 2, s.y - 2 - pulse * 1.5, 6, 1);
     }
     ctx.restore();
   }

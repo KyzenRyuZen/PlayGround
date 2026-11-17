@@ -75,6 +75,7 @@ export class UI {
       qtFill: $('qtFill'), qtCount: $('qtCount'), bossBar: $('bossBar'), bossName: $('bossName'),
       bossLevel: $('bossLevel'), bossFill: $('bossFill'), interactPrompt: $('interactPrompt'),
       interactText: $('interactText'), btnInteract: $('btnInteract'), btnPotion: $('btnPotion'),
+      btnManaPotion: $('btnManaPotion'), manaCount: $('manaCount'),
       btnSkill: $('btnSkill'), btnAttack: $('btnAttack'), btnMount: $('btnMount'), btnAuto: $('btnAuto'),
       potionCount: $('potionCount'), skillIcon: $('skillIcon'), skillName: $('skillName'),
       skillCdMask: $('skillCdMask'), skillCdText: $('skillCdText'), eventFeed: $('eventFeed'),
@@ -196,6 +197,7 @@ export class UI {
     this.el.btnSkill.addEventListener('click', () => this.game?.skillPressed());
     this.el.btnInteract.addEventListener('click', () => this.game?.interactPressed());
     this.el.btnPotion.addEventListener('click', () => this.game?.useHealthPotion());
+    this.el.btnManaPotion.addEventListener('click', () => this.game?.useManaPotion());
     this.el.btnMount.addEventListener('click', () => this.game?.toggleMount());
     this.el.btnAuto.addEventListener('click', () => this.game?.toggleAutoAttack());
     this.el.questTracker.addEventListener('click', () => this.handleUi('openQuests'));
@@ -405,6 +407,10 @@ export class UI {
     this.el.potionCount.textContent = String(
       (c.consumables.health_large || 0) + (c.consumables.health_medium || 0) + (c.consumables.health_small || 0)
     );
+    // mana potion button: count + dimmed when useless (empty stock or full mana)
+    const manaStock = (c.consumables.mana_large || 0) + (c.consumables.mana_medium || 0) + (c.consumables.mana_small || 0);
+    this.el.manaCount.textContent = String(manaStock);
+    this.el.btnManaPotion.style.opacity = manaStock > 0 && c.mana < state.stats().maxMana ? '1' : '0.55';
 
     // skill
     const skill = CLASSES[c.classId].skill;
