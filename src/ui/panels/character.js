@@ -2,7 +2,7 @@
 import { t, tx, icon, esc, fmt, toast, confirmDialog, formatPlaytime } from '../common.js';
 import {
   xpForLevel, currentZone, saveNow, recalc, isUnlocked, applyCosmetic,
-  playerEquippedCosmetic, removeItem,
+  playerEquippedCosmetic, removeItem, INVENTORY_SIZE, STORAGE_SIZE, MAX_LEVEL,
 } from '../../core/game.js';
 import { CLASSES, HAIR_STYLES, HAIR_COLORS, EYE_COLORS, OUTFITS } from '../../data/classes.js';
 import { SLOTS, itemName, MATERIALS, RARITY } from '../../data/items.js';
@@ -113,7 +113,7 @@ export function characterView(panel) {
     </div>
     ${charTags(p)}
     <div class="section-block">
-      <div class="section-head"><h3>${esc(t('common.level'))} ${p.level}</h3><span>${p.level >= 60 ? esc(t('common.max')) : `${fmt(p.xp)} / ${fmt(nextXp)} XP`}</span></div>
+      <div class="section-head"><h3>${esc(t('common.level'))} ${p.level}</h3><span>${p.level >= MAX_LEVEL ? esc(t('common.max')) : `${fmt(p.xp)} / ${fmt(nextXp)} XP`}</span></div>
       ${progressLine(p.xp, nextXp)}
       <div class="hint" style="margin-top:7px">${esc(t('char.powerHint'))}</div>
     </div>
@@ -181,12 +181,12 @@ export function inventoryView(panel) {
   const junk = p.inventory.filter((it) => it.kind === 'equip' && it.rarity === 'grey');
   return {
     title: t('inv.title'),
-    subtitle: t('inv.slots', { used: p.inventory.length, max: 48 }),
+    subtitle: t('inv.slots', { used: p.inventory.length, max: INVENTORY_SIZE }),
     tabs: FILTERS.map((f) => ({ id: f.id, label: t(f.label) })),
     body: `
       <div class="inv-section-title"><span>${esc(t('inv.equipment'))}</span><span>${esc(t('char.slots'))}</span></div>
       <div class="inventory-equip-grid">${gearSlotsHTML(p)}</div>
-      <div class="inv-section-title"><span>${esc(t('inv.bag'))}</span><span>${esc(t('inv.slots', { used: p.inventory.length, max: 48 }))}</span></div>
+      <div class="inv-section-title"><span>${esc(t('inv.bag'))}</span><span>${esc(t('inv.slots', { used: p.inventory.length, max: INVENTORY_SIZE }))}</span></div>
       ${items.length ? `<div class="item-grid" id="bagGrid">${items.map((it) => itemCellHTML(it, `data-item-uid="${esc(it.uid)}" data-item-source="bag"`)).join('')}</div>`
         : `<div class="empty-state">${icon('bag')}<h3>${esc(t('inv.emptyTitle'))}</h3><p>${esc(t('inv.emptyHint'))}</p></div>`}
       <p class="hint" style="margin-top:10px">${esc(t('common.tapToEquip'))} · ${esc(t('common.critCap'))}</p>
@@ -240,7 +240,9 @@ export function mountsView(panel) {
           <div class="hint" style="margin-bottom:6px">${esc(t('mount.speed'))} +${Math.round(mount.speed * 100)}%${mount.source === 'quest' ? ` · ${esc(t('mount.questReward'))}` : ''}</div>
           ${owned
             ? `<button class="btn ${active ? 'ghost' : 'primary'}" data-mount="${mount.id}">${esc(t(active ? 'mount.dismiss' : 'mount.call'))}</button>`
-            : `<button class="btn ghost" data-mount-shop>${esc(t('mount.locked'))} · ${esc(t('store.buy'))}</button>`}
+            : mount.source === 'quest'
+              ? `<button class="btn ghost" disabled>${esc(t('mount.questReward'))}</button>`
+              : `<button class="btn primary" data-mount-shop>${esc(t('store.buy'))} · ${fmt(mount.price ?? 0)} ${esc(t('common.gems'))}</button>`}
         </div>`;
       }).join('')}
     </div>
@@ -378,11 +380,11 @@ export function storageView(panel) {
     subtitle: t('storage.subtitle'),
     body: `<div class="storage-columns">
       <div class="storage-panel">
-        <h3>${esc(t('storage.bag'))}<span>${p.inventory.length}/48</span></h3>
+        <h3>${esc(t('storage.bag'))}<span>${p.inventory.length}/${INVENTORY_SIZE}</span></h3>
         <div class="item-grid">${p.inventory.map((it) => itemCellHTML(it, `data-item-uid="${esc(it.uid)}" data-item-source="bag"`)).join('')}</div>
       </div>
       <div class="storage-panel">
-        <h3>${esc(t('storage.stash'))}<span>${p.storage.length}/60</span></h3>
+        <h3>${esc(t('storage.stash'))}<span>${p.storage.length}/${STORAGE_SIZE}</span></h3>
         ${p.storage.length ? `<div class="item-grid">${p.storage.map((it) => itemCellHTML(it, `data-item-uid="${esc(it.uid)}" data-item-source="storage"`)).join('')}</div>` : `<div class="hint" style="padding:12px 3px">${esc(t('storage.empty'))}</div>`}
       </div>
     </div>
@@ -400,14 +402,14 @@ export function storageView(panel) {
         if (btn.dataset.storageAll === 'deposit') {
           for (const it of [...p.inventory]) {
             if (it.kind !== 'material') continue;
-            if (p.storage.length >= 60) break;
+            if (p.storage.length >= STORAGE_SIZE) break;
             const idx = p.inventory.indexOf(it);
             if (idx >= 0) { p.inventory.splice(idx, 1); p.storage.push(it); }
           }
         } else {
           for (const it of [...p.storage]) {
             if (it.kind !== 'material') continue;
-            if (p.inventory.length >= 48) break;
+            if (p.inventory.length >= INVENTORY_SIZE) break;
             const idx = p.storage.indexOf(it);
             if (idx >= 0) { p.storage.splice(idx, 1); p.inventory.push(it); }
           }

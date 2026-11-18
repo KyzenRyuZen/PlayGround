@@ -68,6 +68,12 @@ export class WorldEngine {
     this.comboTimer = 0;
   }
 
+  // Ambient motes are drawn procedurally per weather type; this keeps the
+  // particle pool available for effects that want persistent state.
+  buildParticles() {
+    this.particles = [];
+  }
+
   // ── lifecycle ───────────────────────────────────────────────────────────
   attach() {
     this.resize();
@@ -573,6 +579,7 @@ export class WorldEngine {
       this.notify(t('hud.levelUp') + ' ' + t('hud.levelUpText', { lv: this.player.level }), 'good');
       this.sfx('levelup');
       this.game.flashLevel = this.time;
+      App.screen?.syncTradeIdentity?.();
       this.save();
     }
     // drops
@@ -1336,7 +1343,7 @@ export class WorldEngine {
     const zt = this.zoneTitleUntil - this.time;
     if (zt > 0) {
       const a = Math.min(1, zt / 0.6) * Math.min(1, (4.2 - zt) / 0.5 + 0.2);
-      const cy = this.h * 0.28;
+      const cy = this.h * 0.37;
       ctx.save(); ctx.globalAlpha = clamp(a, 0, 1);
       const g = ctx.createLinearGradient(0, cy - 50, 0, cy + 50);
       g.addColorStop(0, 'rgba(5,5,8,0)'); g.addColorStop(0.5, 'rgba(5,5,8,.55)'); g.addColorStop(1, 'rgba(5,5,8,0)');
@@ -1346,10 +1353,18 @@ export class WorldEngine {
       ctx.fillText(t('zone.enterTitle').toUpperCase(), this.w / 2, cy - 12);
       ctx.fillStyle = '#f4e3b0'; ctx.font = '600 26px Cinzel, Georgia, serif';
       ctx.shadowColor = 'rgba(217,183,106,.4)'; ctx.shadowBlur = 12;
-      ctx.fillText(t(zone.key), this.w / 2, cy + 18);
+      ctx.fillText(t(zone.key), this.w / 2, cy + 18, this.w - 36);
       ctx.shadowBlur = 0;
       ctx.fillStyle = 'rgba(200,190,170,.75)'; ctx.font = '400 9.5px Inter, sans-serif';
-      ctx.fillText(`${t('zone.levelRange', { min: zone.min, max: zone.max })}  ·  ${t(zone.descKey).slice(0, 52)}${t(zone.descKey).length > 52 ? '…' : ''}`, this.w / 2, cy + 36);
+      ctx.fillText(t('zone.levelRange', { min: zone.min, max: zone.max }), this.w / 2, cy + 35);
+      const desc = t(zone.descKey);
+      const maxW = this.w - 48;
+      let line = desc;
+      if (ctx.measureText(line).width > maxW) {
+        while (line.length > 8 && ctx.measureText(`${line}…`).width > maxW) line = line.slice(0, -1);
+        line = `${line.trimEnd()}…`;
+      }
+      ctx.fillText(line, this.w / 2, cy + 47);
       ctx.restore();
     }
     // interaction prompt label near bottom center
@@ -1582,9 +1597,14 @@ export class WorldEngine {
 }
 
 function hexA(hex, a) {
-  const h = hex.replace('#', '');
+  const text = String(hex ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return `rgba(${r || 0},${g || 0},${b || 0},${a})`;
+  }
+  const h = text.replace('#', '');
   const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
-  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  const r = parseInt(n.slice(0, 2), 16) || 0, g = parseInt(n.slice(2, 4), 16) || 0, b = parseInt(n.slice(4, 6), 16) || 0;
   return `rgba(${r},${g},${b},${a})`;
 }
 

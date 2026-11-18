@@ -1,7 +1,16 @@
 import { rngFrom } from '../core/utils.js';
 
 const TAU = Math.PI * 2;
-const hexRgb = (h) => { const c = h.replace('#', ''); return [parseInt(c.slice(0, 2), 16), parseInt(c.slice(2, 4), 16), parseInt(c.slice(4, 6), 16)]; };
+const hexRgb = (value) => {
+  const text = String(value ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return [r || 0, g || 0, b || 0];
+  }
+  const c = text.replace('#', '');
+  const n = c.length === 3 ? c.split('').map((x) => x + x).join('') : c;
+  return [parseInt(n.slice(0, 2), 16) || 0, parseInt(n.slice(2, 4), 16) || 0, parseInt(n.slice(4, 6), 16) || 0];
+};
 const mix = (a, b, t) => {
   const A = hexRgb(a), B = hexRgb(b);
   return `rgb(${Math.round(A[0] + (B[0] - A[0]) * t)},${Math.round(A[1] + (B[1] - A[1]) * t)},${Math.round(A[2] + (B[2] - A[2]) * t)})`;

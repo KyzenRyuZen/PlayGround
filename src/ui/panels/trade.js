@@ -271,15 +271,18 @@ function openPicker(panel) {
   }));
 }
 
-function applyCompletion(panel, msg) {
+function applyCompletion(panel, message) {
+  const msg = message?.trade ?? message;
   const client = panel.screen.tradeClient;
   const me = client?.identity?.id;
   const mine = msg.a?.id === me ? msg.a : msg.b;
   const theirs = msg.a?.id === me ? msg.b : msg.a;
   const p = panel.player;
-  for (const item of mine?.items ?? []) removeItem(p, item, item.qty ?? 1);
+  const myItems = mine?.offer ?? mine?.items ?? [];
+  const theirItems = theirs?.offer ?? theirs?.items ?? [];
+  for (const item of myItems) removeItem(p, item, item.qty ?? 1);
   let stored = 0;
-  for (const raw of theirs?.items ?? []) {
+  for (const raw of theirItems) {
     const item = { ...raw };
     if (!item.uid || p.inventory.some((x) => x.uid === item.uid) || p.storage.some((x) => x.uid === item.uid)) {
       item.uid = uid(item.kind === 'equip' ? 'eq' : 'it');

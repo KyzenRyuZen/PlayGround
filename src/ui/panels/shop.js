@@ -22,11 +22,11 @@ const TAB_LABEL = {
 function categoryOf(item) {
   if (item.descKey) return 'gems';
   if (HAIR_SHOP[item.id]) return 'hair';
-  if (COSTUMES[item.id]) return 'costumes';
-  if (MOUNTS[item.id]) return 'mounts';
-  if (PETS[item.id]) return 'pets';
+  if (COSTUMES[item.id]) return 'costume';
+  if (MOUNTS[item.id]) return 'mount';
+  if (PETS[item.id]) return 'pet';
   if (FXS[item.id]) return 'fx';
-  if (WINGS_SHOP[item.id]) return 'wings';
+  if (WINGS_SHOP[item.id]) return 'wing';
   return 'featured';
 }
 
@@ -34,6 +34,7 @@ function owned(p, type, item) {
   if (type === 'hair') return p.hairUnlocks.includes(item.style);
   if (type === 'costume') return p.costumes.includes(item.id);
   if (type === 'mount') return p.mounts.includes(item.id);
+  if (type === 'gems') return false;
   if (type === 'pet') return p.pets.includes(item.id);
   if (type === 'fx') return p.fxUnlocks.includes(item.id);
   if (type === 'wing') return p.wings.includes(item.id);
@@ -70,7 +71,7 @@ function storeCard(panel, item) {
   const type = categoryOf(item);
   const isOwned = owned(p, type, item);
   const active = equipped(p, type, item);
-  const questOnly = type === 'wing' && item.id === 'wing_eternity';
+  const questOnly = item.source === 'quest' || (type === 'wing' && item.id === 'wing_eternity');
   const price = item.price ?? 0;
   const canAfford = p.gems >= price;
   return `<div class="store-card${isOwned ? ' owned' : ''}" style="--sc:${item.color || item.colors?.[1] || '#d9b76a'}">
@@ -131,7 +132,7 @@ export function shopView(panel) {
         const type = btn.dataset.buyStore;
         const id = btn.dataset.storeId;
         const item = shopCatalog(tab).find((x) => x.id === id) || Object.values({ ...COSTUMES, ...HAIR_SHOP, ...MOUNTS, ...PETS, ...FXS, ...WINGS_SHOP }).find((x) => x.id === id);
-        if (!item) return;
+        if (!item || item.source === 'quest') return;
         if (item.price > p.gems) { toast(t('common.notEnoughGems'), 'bad'); return; }
         confirmDialog(t('store.buy'), t('store.buyConfirm', { item: tx(item.name), price: item.price }), () => {
           p.gems -= item.price;

@@ -1,4 +1,5 @@
 import { CLASSES, HAIR_COLORS, EYE_COLORS, OUTFITS } from '../data/classes.js';
+import { tx } from '../core/i18n.js';
 import { heroAppearance } from '../ui/heroArt.js';
 import { WINGS } from '../data/items.js';
 import { MOUNTS } from '../data/shop.js';
@@ -6,18 +7,32 @@ import { TAU } from '../core/utils.js';
 import { icon } from '../ui/icons.js';
 
 const rgba = (hex, a) => {
-  const h = hex.replace('#', '');
+  const text = String(hex ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return `rgba(${r || 0},${g || 0},${b || 0},${a})`;
+  }
+  const h = text.replace('#', '');
   const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
-  return `rgba(${parseInt(n.slice(0, 2), 16)},${parseInt(n.slice(2, 4), 16)},${parseInt(n.slice(4, 6), 16)},${a})`;
+  return `rgba(${parseInt(n.slice(0, 2), 16) || 0},${parseInt(n.slice(2, 4), 16) || 0},${parseInt(n.slice(4, 6), 16) || 0},${a})`;
+};
+const alpha = (hex, a) => rgba(hex, a);
+const colorParts = (value) => {
+  const text = String(value ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return [r || 0, g || 0, b || 0];
+  }
+  const h = text.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
+  return [parseInt(n.slice(0, 2), 16) || 0, parseInt(n.slice(2, 4), 16) || 0, parseInt(n.slice(4, 6), 16) || 0];
 };
 const lighten = (hex, t) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  const [r, g, b] = colorParts(hex);
   return `rgb(${Math.round(r + (255 - r) * t)},${Math.round(g + (255 - g) * t)},${Math.round(b + (255 - b) * t)})`;
 };
 const darken = (hex, t) => {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  const [r, g, b] = colorParts(hex);
   return `rgb(${Math.round(r * (1 - t))},${Math.round(g * (1 - t))},${Math.round(b * (1 - t))})`;
 };
 
@@ -397,9 +412,14 @@ export function drawPortal(ctx, portal, t, camp) {
     ctx.beginPath(); ctx.arc(Math.cos(a) * 30, -48 + Math.sin(a) * 40, 1.8, 0, TAU); ctx.fill();
   }
   // label
-  ctx.fillStyle = 'rgba(0,0,0,.5)'; roundRectLocal(ctx, -48, 8, 96, 18, 3); ctx.fill();
-  ctx.fillStyle = '#e9dcc0'; ctx.font = '9px Inter, sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText(camp ? '' : '', 0, 0);
+  if (portal.label) {
+    const label = tx(portal.label);
+    ctx.font = '9px Inter, sans-serif'; ctx.textAlign = 'center';
+    const lw = Math.max(96, ctx.measureText(label).width + 18);
+    ctx.fillStyle = 'rgba(0,0,0,.55)'; roundRectLocal(ctx, -lw / 2, 8, lw, 18, 3); ctx.fill();
+    ctx.fillStyle = '#e9dcc0';
+    ctx.fillText(label, 0, 21, lw - 10);
+  }
   ctx.restore();
 }
 

@@ -2,8 +2,14 @@ import { CLASSES, HAIR_COLORS, EYE_COLORS, OUTFITS } from '../data/classes.js';
 
 const TAU = Math.PI * 2;
 const hexToRgb = (hex) => {
-  const h = hex.replace('#', '');
-  return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+  const text = String(hex ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return { r: r || 0, g: g || 0, b: b || 0 };
+  }
+  const h = text.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
+  return { r: parseInt(n.slice(0, 2), 16) || 0, g: parseInt(n.slice(2, 4), 16) || 0, b: parseInt(n.slice(4, 6), 16) || 0 };
 };
 const rgba = (hex, a) => { const c = hexToRgb(hex); return `rgba(${c.r},${c.g},${c.b},${a})`; };
 const mix = (hex, hex2, t) => {
@@ -543,7 +549,10 @@ export function renderHero(canvas, player, time = 0, opts = {}) {
   if (!canvas) return;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const rect = canvas.getBoundingClientRect();
-  const cw = Math.max(1, rect.width), ch = Math.max(1, rect.height);
+  // Cap the backing store. A canvas without CSS sizing reports its own
+  // attribute size as its layout size, which would otherwise double every frame.
+  const cw = Math.min(2048, Math.max(1, rect.width));
+  const ch = Math.min(2048, Math.max(1, rect.height));
   if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(ch * dpr)) {
     canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
   }

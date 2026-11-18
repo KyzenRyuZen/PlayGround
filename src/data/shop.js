@@ -53,7 +53,7 @@ export function shopCatalog(tab) {
     case 'mounts': return Object.values(MOUNTS).filter((m) => m.source === 'shop');
     case 'pets': return Object.values(PETS);
     case 'fx': return Object.values(FXS);
-    case 'wings': return Object.values(WINGS_SHOP);
+    case 'wings': return Object.values(WINGS_SHOP).filter((w) => w.source === 'shop');
     case 'gems': return GEM_PACKS;
     case 'featured':
     default:

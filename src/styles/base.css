@@ -70,6 +70,7 @@ svg{display:block;}
 .btn.small{min-height:34px;padding:0 14px;font-size:9.5px;letter-spacing:.12em;}
 .btn.wide{width:100%;}
 .btn:disabled{opacity:.4;pointer-events:none;}
+.ico{width:16px;height:16px;flex:none;}
 .icon-btn{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(217,183,106,.25);background:rgba(8,9,14,.6);color:#d6cbaa;border-radius:2px;backdrop-filter:blur(8px);}
 .icon-btn:active{transform:scale(.94);}
 .icon-btn svg{width:20px;height:20px;}

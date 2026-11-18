@@ -28,6 +28,7 @@ class AetheriaApp {
     window.__AETHERIA_SETTINGS__ = this.settings;
     App.settings = this.settings;
     App.screen = this;
+    App.audio = this.audio;
     document.body.classList.toggle('reduce-motion', Boolean(this.settings.reduceMotion));
     this.bindGlobal();
     this.registerServiceWorker();
@@ -154,6 +155,7 @@ class AetheriaApp {
     App.settings = this.settings;
     App.game = this.game;
     App.screen = this;
+    App.ui = this;
     this.tradeClient.disconnect();
 
     this.menuCleanup?.();
@@ -165,7 +167,8 @@ class AetheriaApp {
     this.panels = new Panels(this);
     this.hud = new WorldHud(this);
     this.hud.attach();
-    this.engine = this.screen.engine;
+    this.engine = this.hud.engine;
+    App.engine = this.engine;
     saveNow(true);
     this.audio.unlock();
   }
@@ -180,6 +183,20 @@ class AetheriaApp {
   }
 
   // ── hooks used by engine / panels / screens ───────────────────────────────
+  // Keep the server presence card in sync when the hero levels up or travels.
+  syncTradeIdentity() {
+    const p = this.game?.player;
+    const client = this.tradeClient;
+    if (!p || client.state !== 'online' || !client.identity) return;
+    client.updateIdentity({
+      ...client.identity,
+      name: p.name,
+      classId: p.classId,
+      level: p.level,
+      zoneId: p.zoneId,
+    });
+  }
+
   applyLanguage() {
     this.settings.lang = document.documentElement.lang || this.settings.lang;
     saveSettings(this.settings);
@@ -202,6 +219,7 @@ class AetheriaApp {
     if (!p.discoveredZones.includes(zone.id)) p.discoveredZones.push(zone.id);
     ensureStoryQuest(p, zone.id);
     this.engine?.loadZone(zone.id, { restore: false });
+    this.syncTradeIdentity();
     saveNow();
     this.hud?.refresh();
     this.hud?.updateQuestTracker();

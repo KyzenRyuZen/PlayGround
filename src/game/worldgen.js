@@ -141,14 +141,28 @@ function makeTerrain(zone) {
 }
 
 function hexA(hex, a) {
-  const h = hex.replace('#', '');
+  const text = String(hex ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return `rgba(${r || 0},${g || 0},${b || 0},${a})`;
+  }
+  const h = text.replace('#', '');
   const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
-  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  const r = parseInt(n.slice(0, 2), 16) || 0, g = parseInt(n.slice(2, 4), 16) || 0, b = parseInt(n.slice(4, 6), 16) || 0;
   return `rgba(${r},${g},${b},${a})`;
 }
+function colorParts(value) {
+  const text = String(value ?? '').trim();
+  if (text.startsWith('rgb')) {
+    const [r, g, b] = text.replace(/[^\d.,]/g, '').split(',').map(Number);
+    return [r || 0, g || 0, b || 0];
+  }
+  const h = text.replace('#', '');
+  const n = h.length === 3 ? h.split('').map((x) => x + x).join('') : h;
+  return [parseInt(n.slice(0, 2), 16) || 0, parseInt(n.slice(2, 4), 16) || 0, parseInt(n.slice(4, 6), 16) || 0];
+}
 function lighten(hex, t) {
-  const h = hex.replace('#', '');
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+  const [r, g, b] = colorParts(hex);
   return `rgb(${Math.round(r + (255 - r) * t)},${Math.round(g + (255 - g) * t)},${Math.round(b + (255 - b) * t)})`;
 }
 
@@ -230,11 +244,11 @@ export function generateZone(zoneId) {
         y = 190 + rng() * (WORLD_SIZE - 420);
         tries++;
       } while (tries < 40 && (dist(x, y, camp.x, camp.y) < minDist || dist(x, y, bossPos.x, bossPos.y) < 170 || props.some((p) => p.solid && dist(x, y, p.x, p.y) < 40)));
-      spawns.push({ ...mon, x, y, elite: false });
+      spawns.push({ ...mon, x, y, elite: Boolean(mon.elite) });
     }
   };
   for (const mon of zone.monsters) addSpawns(mon, mon.count, 230);
-  addSpawns({ ...zone.elite, id: zone.elite.id, name: zone.elite.name, count: 1, xp: 1, gold: 1 }, 3, 300);
+  addSpawns({ ...zone.elite, id: zone.elite.id, name: zone.elite.name, count: 1, xp: 1, gold: 1, elite: true }, 3, 300);
   const bossSpawn = { ...zone.boss, x: bossPos.x, y: bossPos.y + 40, elite: false, boss: true };
   spawns.push(bossSpawn);
 

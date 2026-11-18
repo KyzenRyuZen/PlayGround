@@ -10,6 +10,7 @@ import { deleteGame, saveSettings } from '../core/save.js';
 import {
   App, currentZone, saveNow, canEquip, equipItem, unequipItem, sellItem, sellValue,
   salvageEssence, addEssence, fuseItem, recalc, applyCosmetic, removeItem,
+  INVENTORY_SIZE, STORAGE_SIZE,
 } from '../core/game.js';
 import { itemName } from '../data/items.js';
 import { itemCardHTML, itemCellHTML, itemLabel, itemRarity } from './panelKit.js';
@@ -186,7 +187,7 @@ export class Panels {
           </div>
           <div class="menu-grid">
             ${tile('character', 'user', t('menu.character'), `${t('char.power')} ${fmt(p.stats?.power ?? 0)}`, 'primary')}
-            ${tile('inventory', 'bag', t('menu.inventory'), t('inv.slots', { used: p.inventory.length, max: 48 }))}
+            ${tile('inventory', 'bag', t('menu.inventory'), t('inv.slots', { used: p.inventory.length, max: INVENTORY_SIZE }))}
             ${tile('quests', 'quest', t('menu.quests'), `${p.questsDone ?? 0} ${t('common.done')}`, 'primary')}
             ${tile('world', 'map', t('menu.world'), t('world.subtitle'))}
             ${tile('shop', 'shop', t('menu.shop'), t('store.subtitle'))}
@@ -418,7 +419,7 @@ export class Panels {
       recalc(p);
       message = t(p.activeStone ? 'stone.activated' : 'stone.deactivated');
     } else if (action === 'storage') {
-      if (p.storage.length >= 60) { message = t('common.storageFull'); kind = 'bad'; }
+      if (p.storage.length >= STORAGE_SIZE) { message = t('common.storageFull'); kind = 'bad'; }
       else {
         const idx = p.inventory.findIndex((x) => x.uid === item.uid);
         if (idx >= 0) {
@@ -428,7 +429,7 @@ export class Panels {
         }
       }
     } else if (action === 'withdraw') {
-      if (p.inventory.length >= 48) { message = t('common.inventoryFull'); kind = 'bad'; }
+      if (p.inventory.length >= INVENTORY_SIZE) { message = t('common.inventoryFull'); kind = 'bad'; }
       else {
         const idx = p.storage.findIndex((x) => x.uid === item.uid);
         if (idx >= 0) {
